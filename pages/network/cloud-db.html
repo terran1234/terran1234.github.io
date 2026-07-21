@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>클라우드, 커널 설정, DB 복제 — 조경익</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff; --bg-alt:#f5f6f8; --panel:#f7f8fa; --panel-border:#e2e5ea;
+    --text:#1a1f24; --text-dim:#4b5560; --text-faint:#7c8894; --accent:#0f9d8f; --line:#e5e8ec;
+    --c-cloud:#7c3aed;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:radial-gradient(ellipse at top left, rgba(94,234,212,0.06), transparent 45%), var(--bg);
+    color:var(--text); font-family:'Noto Sans KR', sans-serif; line-height:1.7; -webkit-font-smoothing:antialiased;}
+  .mono{font-family:'JetBrains Mono', monospace;}
+  a{color:inherit; text-decoration:none;}
+  .wrap{max-width:760px; margin:0 auto; padding:0 24px;}
+  .topbar{border-bottom:1px solid var(--line); background:rgba(255,255,255,0.9); backdrop-filter:blur(6px);}
+  .topbar-inner{display:flex; align-items:center; gap:16px; padding:14px 24px; max-width:760px; margin:0 auto;
+    font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--text-dim);}
+  .topbar-inner a:hover{color:var(--accent);}
+  .sep{color:var(--text-faint);}
+  .hero{padding:44px 0 28px; border-bottom:1px solid var(--line); margin-bottom:32px;}
+  .eyebrow{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--c-cloud); letter-spacing:.08em; margin-bottom:14px;}
+  .hero h1{font-size:clamp(24px,4vw,32px); font-weight:900; margin-bottom:10px;}
+  .hero p{color:var(--text-dim); font-size:14px;}
+  .content{padding-bottom:70px;}
+  .content h2{font-size:19px; font-weight:700; margin:38px 0 14px; padding-bottom:8px; border-bottom:1px solid var(--line);}
+  .content h3{font-size:15px; font-weight:700; margin:22px 0 8px; color:var(--c-cloud);}
+  .content p{font-size:14px; color:var(--text-dim); margin-bottom:10px;}
+  .content ul{margin:0 0 14px 20px; font-size:14px; color:var(--text-dim);}
+  .content li{margin-bottom:4px;}
+  .content li b{color:var(--text);}
+  table{width:100%; border-collapse:collapse; margin:14px 0 20px; font-size:13px;}
+  th, td{border:1px solid var(--panel-border); padding:8px 12px; text-align:left;}
+  th{background:var(--panel); color:var(--text); font-family:'JetBrains Mono',monospace; font-size:12px;}
+  td{color:var(--text-dim);}
+  pre{background:var(--panel); border:1px solid var(--panel-border); border-radius:8px; padding:14px 16px;
+    overflow-x:auto; margin:12px 0; font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--accent); line-height:1.6;}
+  code.mono{background:var(--panel); padding:1px 5px; border-radius:4px; font-size:12.5px;}
+  footer{border-top:1px solid var(--line); padding:24px 0 50px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-faint);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="../../index.html">메인</a><span class="sep">/</span>
+    <a href="../../network.html">서버·네트워크 기초</a><span class="sep">/</span>
+    <span>클라우드, 커널 설정, DB 복제</span>
+  </div>
+</div>
+
+<div class="wrap">
+  <section class="hero">
+    <div class="eyebrow mono">13 · 클라우드 / DB</div>
+    <h1>클라우드, 커널 설정, DB 복제</h1>
+    <p>IaaS/PaaS/SaaS 개념, 커널 파라미터 설정, DB 사용자·권한 관리, MariaDB Master-Slave 복제 정리</p>
+  </section>
+
+  <div class="content">
+
+    <h2>1. 클라우드</h2>
+    <p>인터넷을 통해 서버·저장공간·프로그램 같은 IT 자원을 빌려서 쓰는 것.</p>
+    <table>
+      <tr><th>구분</th><th>IaaS</th><th>PaaS</th><th>SaaS</th></tr>
+      <tr><td>풀네임</td><td>Infrastructure as a Service</td><td>Platform as a Service</td><td>Software as a Service</td></tr>
+      <tr><td>의미</td><td>가상화된 HW 자원 제공</td><td>개발 환경 제공</td><td>완성된 소프트웨어 제공</td></tr>
+      <tr><td>내가 관리</td><td>OS, 프로그램, 데이터</td><td>코드, 데이터</td><td>거의 없음</td></tr>
+      <tr><td>대표 서비스</td><td>AWS EC2</td><td>Google App Engine</td><td>Microsoft 365</td></tr>
+    </table>
+
+    <h2>2. 커널 설정</h2>
+    <pre>sysctl
+sysctl -w vm.swappiness=40
+
+vi /etc/sysctl.conf   // 영구 반영</pre>
+    <p><code class="mono">sysctl</code>로 바꾼 값은 일시적이라 재부팅하면 사라짐. 영구 반영하려면 설정 파일 편집 필요.</p>
+    <pre>free -h
+cat /proc/meminfo
+cat /proc/version
+cat /proc/cpuinfo</pre>
+    <p>메모리(RAM), 커널 버전, CPU 정보 확인.</p>
+
+    <h2>3. DB 보안 (사용자·권한)</h2>
+    <pre>create user 'estuser'@'localhost' identified by '1234';
+create database est default character set utf8;</pre>
+    <pre>drop user hoon;
+drop user 'winuser'@'172.30.1.76';</pre>
+    <pre>grant all privileges on est_db.* to 'estuser'@'localhost';
+grant create, drop on est_db.* to 'winuser'@'172.30.1.76';
+flush privileges;
+show grants;
+show grants for 'estuser'@'localhost';</pre>
+    <p><code class="mono">all privileges</code>가 아니면 <code class="mono">privileges</code>는 빼야 함. <code class="mono">show grants</code>는 접속 계정 본인 권한만 출력. <code class="mono">grant</code>로 사용자 생성과 권한 부여를 동시에 처리 가능.</p>
+    <pre>revoke all privileges on *.* from 'edushare'@'localhost';</pre>
+
+    <h2>4. DB 복제 (Master-Slave)</h2>
+    <h3>Master 서버 설정</h3>
+    <pre>vi /etc/my.cnf.d/mariadb-server.cnf
+server-id=1
+log_bin=/var/log/mariadb/mysql-bin.log
+expire_logs_days=10
+max_binlog_size=10M
+
+touch /var/log/mariadb/mysql-bin.log
+systemctl restart mariadb</pre>
+    <p><code class="mono">log_bin</code>은 DB 작업(INSERT, UPDATE 등)을 기록하는 설정 — 이걸 켜면 마스터 역할.</p>
+
+    <h3>Slave 권한 부여 & 서버 설정</h3>
+    <pre>grant replication slave on *.* to 'slave_db'@'%' identified by '1234';
+flush privileges;
+systemctl restart mariadb</pre>
+    <pre>vi /etc/my.cnf.d/mariadb-server.cnf
+server-id=2
+
+systemctl restart mariadb</pre>
+
+    <h3>Slave DB 설정</h3>
+    <pre>show variables like 'server_id';
+
+change master to master_host="172.30.1.24",
+  master_user="slave_db",
+  master_password="1234",
+  master_port=3306,
+  master_log_file="mysql-bin.000004",
+  master_log_pos=342;
+
+show slave status\G</pre>
+    <p><code class="mono">CHANGE MASTER</code> 명령을 실행하면 슬레이브 역할로 동작.</p>
+
+    <h2>5. 우분투 기본 설정</h2>
+    <pre>sudo apt-get update -y
+sudo apt install -y vim
+sudo apt-get install -y iputils-ping</pre>
+    <p>CentOS/RHEL 계열의 <code class="mono">dnf</code> 대신 <code class="mono">apt-get</code>을 사용. iputils-ping은 ping 명령어 패키지.</p>
+
+  </div>
+
+  <footer>© 2026 조경익 · security learning log</footer>
+</div>
+</body>
+</html>
