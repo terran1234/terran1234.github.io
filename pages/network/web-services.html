@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>HTTP, HTTPS, FTP, DNS — 조경익</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff; --bg-alt:#f5f6f8; --panel:#f7f8fa; --panel-border:#e2e5ea;
+    --text:#1a1f24; --text-dim:#4b5560; --text-faint:#7c8894; --accent:#0f9d8f; --line:#e5e8ec;
+    --c-service:#c2410c;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:radial-gradient(ellipse at top left, rgba(94,234,212,0.06), transparent 45%), var(--bg);
+    color:var(--text); font-family:'Noto Sans KR', sans-serif; line-height:1.7; -webkit-font-smoothing:antialiased;}
+  .mono{font-family:'JetBrains Mono', monospace;}
+  a{color:inherit; text-decoration:none;}
+  .wrap{max-width:760px; margin:0 auto; padding:0 24px;}
+  .topbar{border-bottom:1px solid var(--line); background:rgba(255,255,255,0.9); backdrop-filter:blur(6px);}
+  .topbar-inner{display:flex; align-items:center; gap:16px; padding:14px 24px; max-width:760px; margin:0 auto;
+    font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--text-dim);}
+  .topbar-inner a:hover{color:var(--accent);}
+  .sep{color:var(--text-faint);}
+  .hero{padding:44px 0 28px; border-bottom:1px solid var(--line); margin-bottom:32px;}
+  .eyebrow{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--c-service); letter-spacing:.08em; margin-bottom:14px;}
+  .hero h1{font-size:clamp(24px,4vw,32px); font-weight:900; margin-bottom:10px;}
+  .hero p{color:var(--text-dim); font-size:14px;}
+  .content{padding-bottom:70px;}
+  .content h2{font-size:19px; font-weight:700; margin:38px 0 14px; padding-bottom:8px; border-bottom:1px solid var(--line);}
+  .content h3{font-size:15px; font-weight:700; margin:22px 0 8px; color:var(--c-service);}
+  .content p{font-size:14px; color:var(--text-dim); margin-bottom:10px;}
+  .content ul{margin:0 0 14px 20px; font-size:14px; color:var(--text-dim);}
+  .content li{margin-bottom:4px;}
+  .content li b{color:var(--text);}
+  table{width:100%; border-collapse:collapse; margin:14px 0 20px; font-size:13px;}
+  th, td{border:1px solid var(--panel-border); padding:8px 12px; text-align:left;}
+  th{background:var(--panel); color:var(--text); font-family:'JetBrains Mono',monospace; font-size:12px;}
+  td{color:var(--text-dim);}
+  pre{background:var(--panel); border:1px solid var(--panel-border); border-radius:8px; padding:14px 16px;
+    overflow-x:auto; margin:12px 0; font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--accent); line-height:1.6;}
+  code.mono{background:var(--panel); padding:1px 5px; border-radius:4px; font-size:12.5px;}
+  footer{border-top:1px solid var(--line); padding:24px 0 50px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-faint);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="../../index.html">메인</a><span class="sep">/</span>
+    <a href="../../network.html">서버·네트워크 기초</a><span class="sep">/</span>
+    <span>HTTP, HTTPS, FTP, DNS</span>
+  </div>
+</div>
+
+<div class="wrap">
+  <section class="hero">
+    <div class="eyebrow mono">11 · 서비스 구축</div>
+    <h1>HTTP, HTTPS, FTP, DNS</h1>
+    <p>아파치·SSL 인증서·vsftpd·BIND로 4가지 핵심 서버를 직접 구축한 기록</p>
+  </section>
+
+  <div class="content">
+
+    <h2>1. HTTP 서버</h2>
+    <p>웹에서 데이터를 주고받는 규칙, 80번 포트/tcp 사용.</p>
+    <pre>dnf install -y httpd mariadb-server php
+systemctl start httpd
+firewall-cmd --permanent --add-port=80/tcp
+firewall-cmd --reload</pre>
+    <pre>&lt;html&gt;&lt;body&gt;Hello world!&lt;/body&gt;&lt;/html&gt;
+// /var/www/html/test.html 경로에 생성</pre>
+
+    <h2>2. HTTPS 서버</h2>
+    <p>HTTP에 SSL/TLS 암호화를 적용한 보안 통신 프로토콜. 요즘은 TLS를 쓰지만 관습적으로 SSL이라 부름.</p>
+    <pre>mkdir /etc/httpd/conf/ssl
+cd /etc/httpd/conf/ssl</pre>
+    <pre>openssl req -newkey rsa:2048 -nodes -keyout /etc/httpd/conf/ssl/test.com.key -x509 -days 365 -out /etc/httpd/conf/ssl/test.com.crt
+openssl x509 -noout -text -in test.com.crt</pre>
+    <p>rsa:2048=비대칭키 2048비트, -nodes=비밀번호 없이 키 생성, -x509=인증서 생성, -days=유효기간.</p>
+    <pre>dnf install -y mod_ssl
+httpd -M
+
+vi /etc/httpd/conf.d/ssl.conf
+SSLCertificateFile /etc/httpd/conf/ssl/test.com.crt
+SSLCertificateKeyFile /etc/httpd/conf/ssl/test.com.key
+
+systemctl restart httpd</pre>
+    <pre>firewall-cmd --permanent --add-service=https
+firewall-cmd --reload</pre>
+    <p>공인 기관(CA)이 아닌 직접 만든 인증서라 브라우저에서 경고 문구가 뜸.</p>
+
+    <h2>3. FTP 서버</h2>
+    <p>파일 업로드/다운로드용 프로토콜. 기본 포트 21(제어), 내부적으로 20(전송) 동작.</p>
+    <ul>
+      <li><b>Active Mode</b> — 서버가 클라이언트로 데이터 연결 시도 (방화벽에 막히기 쉬움)</li>
+      <li><b>Passive Mode</b> — 클라이언트가 서버로 연결 시도, 1024 이상(보통 50000~55000) 포트 사용, 방화벽 환경에서 더 많이 사용</li>
+    </ul>
+    <pre>dnf install -y vsftpd
+systemctl start vsftpd
+systemctl enable vsftpd
+
+firewall-cmd --permanent --add-service=ftp
+firewall-cmd --reload</pre>
+    <pre>useradd ftptest
+passwd ftptest
+mkdir /home/ftptest
+touch /home/ftptest/ftp.txt</pre>
+    <p>FileZilla 클라이언트로 접속해 확인. /home 디렉토리에 계정 생성됨.</p>
+
+    <h3>FTPS 서버 (SSL 암호화)</h3>
+    <pre>openssl req -newkey rsa:2048 -nodes -keyout /etc/vsftpd/vsftpd.pem -x509 -days 365 -out /etc/vsftpd/vsftpd.pem</pre>
+    <pre>vi /etc/vsftpd/vsftpd.conf
+ssl_enable=YES
+rsa_cert_file=/etc/vsftpd/vsftpd.pem
+force_local_logins_ssl=YES
+force_local_data_ssl=YES
+ssl_tlsv1=YES
+allow_anon_ssl=NO
+pasv_enable=YES
+pasv_min_port=50000
+pasv_max_port=55000
+
+systemctl restart vsftpd</pre>
+    <pre>firewall-cmd --permanent --add-port=50000-55000/tcp
+firewall-cmd --reload</pre>
+    <p>vsftpd는 SSL 기능이 내장돼 있어 HTTPS처럼 별도 모듈 설치가 필요 없음.</p>
+
+    <h3>SFTP</h3>
+    <p>FileZilla에서 SFTP로 설정, 포트 22번 사용. 리눅스는 SSH가 기본 설치돼 있어 추가 설정 없이 바로 사용 가능.</p>
+
+    <h2>4. DNS</h2>
+    <p>도메인 이름을 IP 주소로 바꿔주는 시스템.</p>
+    <table>
+      <tr><th>레코드</th><th>의미</th></tr>
+      <tr><td>A</td><td>도메인 → IPv4</td></tr>
+      <tr><td>AAAA</td><td>도메인 → IPv6</td></tr>
+      <tr><td>CNAME</td><td>별명(다른 도메인으로 연결)</td></tr>
+      <tr><td>MX</td><td>메일 서버</td></tr>
+      <tr><td>NS</td><td>DNS 서버</td></tr>
+      <tr><td>SOA</td><td>전체 설정 정보</td></tr>
+    </table>
+    <pre>dnf install -y bind bind-utils</pre>
+    <pre>vi /etc/named.conf
+listen-on port 53 { any; };
+allow-query     { any; };
+recursion no;
+zone "test.com" IN {
+    type master;
+    file "test.com.zone";
+    allow-update { none; };
+};</pre>
+    <pre>vi /var/named/[도메인].com.zone
+$TTL 86400
+@   IN  SOA  ns.test.com. root.test.com. ( 20260402 24H 15M 48H 86400 );
+    IN  NS   ns.test.com.
+@   IN  A    [DNS IP]
+ns  IN  A    [NS 서버 IP]
+www IN  A    [WEB 서버 IP]</pre>
+    <pre>named-checkconf /etc/named.conf
+named-checkzone [도메인].com /var/named/[도메인].com.zone
+
+firewall-cmd --permanent --add-service=dns
+firewall-cmd --reload
+systemctl start named
+systemctl enable named</pre>
+    <p>테스트 시 클라이언트의 로컬 DNS 설정도 직접 구축한 NS 주소로 수동 변경 필요.</p>
+
+  </div>
+
+  <footer>© 2026 조경익 · security learning log</footer>
+</div>
+</body>
+</html>
