@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Webhacking.kr - 2 — 조경익</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff; --bg-alt:#f5f6f8; --panel:#f7f8fa; --panel-border:#e2e5ea;
+    --text:#1a1f24; --text-dim:#4b5560; --text-faint:#7c8894; --accent:#0f9d8f; --line:#e5e8ec;
+    --c-wargame:#dc2626;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:radial-gradient(ellipse at top left, rgba(94,234,212,0.06), transparent 45%), var(--bg);
+    color:var(--text); font-family:'Noto Sans KR', sans-serif; line-height:1.7; -webkit-font-smoothing:antialiased;}
+  .mono{font-family:'JetBrains Mono', monospace;}
+  a{color:inherit; text-decoration:none;}
+  .wrap{max-width:760px; margin:0 auto; padding:0 24px;}
+  .topbar{border-bottom:1px solid var(--line); background:rgba(255,255,255,0.9); backdrop-filter:blur(6px);}
+  .topbar-inner{display:flex; align-items:center; gap:16px; padding:14px 24px; max-width:760px; margin:0 auto;
+    font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--text-dim);}
+  .topbar-inner a:hover{color:var(--accent);}
+  .sep{color:var(--text-faint);}
+  .hero{padding:44px 0 28px; border-bottom:1px solid var(--line); margin-bottom:32px;}
+  .eyebrow{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--c-wargame); letter-spacing:.08em; margin-bottom:14px;}
+  .hero h1{font-size:clamp(24px,4vw,32px); font-weight:900; margin-bottom:10px;}
+  .hero p{color:var(--text-dim); font-size:14px;}
+  .content{padding-bottom:70px;}
+  .level{margin-bottom:22px; padding:16px 18px; background:var(--panel); border:1px solid var(--panel-border); border-left:3px solid var(--c-wargame); border-radius:8px;}
+  .level h4{font-size:13.5px; font-weight:700; margin-bottom:8px; font-family:'JetBrains Mono',monospace;}
+  .level p{margin-bottom:6px; font-size:13.5px; color:var(--text-dim);}
+  .status{margin-top:20px; padding:14px 16px; border-radius:8px; background:var(--panel); border:1px dashed var(--panel-border); font-size:13px; color:var(--text-faint);}
+  footer{border-top:1px solid var(--line); padding:24px 0 50px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-faint);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="../../index.html">메인</a><span class="sep">/</span>
+    <a href="../../web.html">웹 해킹 / 워게임</a><span class="sep">/</span>
+    <span>Webhacking.kr - 2</span>
+  </div>
+</div>
+
+<div class="wrap">
+  <section class="hero">
+    <div class="eyebrow mono">🎯 워게임 & VM 풀이</div>
+    <h1>Webhacking.kr - 2</h1>
+    <p>Webhacking.kr 심화 문제 풀이 이어서 정리</p>
+  </section>
+
+  <div class="content">
+
+    <div class="level">
+      <h4>old-48</h4>
+      <p>Command Injection을 이용해 해결.</p>
+    </div>
+
+    <div class="level">
+      <h4>old-8</h4>
+      <p>풀이 진행 중.</p>
+    </div>
+
+    <div class="status">📌 계속 풀이하는 대로 추가 예정입니다.</div>
+
+  </div>
+
+  <footer>© 2026 조경익 · security learning log</footer>
+</div>
+</body>
+</html>
