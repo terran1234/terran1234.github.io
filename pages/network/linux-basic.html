@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>리눅스 기본 명령어, SQL — 조경익</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff; --bg-alt:#f5f6f8; --panel:#f7f8fa; --panel-border:#e2e5ea;
+    --text:#1a1f24; --text-dim:#4b5560; --text-faint:#7c8894; --accent:#0f9d8f; --line:#e5e8ec;
+    --c-linux:#0f9d5a;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:radial-gradient(ellipse at top left, rgba(94,234,212,0.06), transparent 45%), var(--bg);
+    color:var(--text); font-family:'Noto Sans KR', sans-serif; line-height:1.7; -webkit-font-smoothing:antialiased;}
+  .mono{font-family:'JetBrains Mono', monospace;}
+  a{color:inherit; text-decoration:none;}
+  .wrap{max-width:760px; margin:0 auto; padding:0 24px;}
+  .topbar{border-bottom:1px solid var(--line); background:rgba(255,255,255,0.9); backdrop-filter:blur(6px);}
+  .topbar-inner{display:flex; align-items:center; gap:16px; padding:14px 24px; max-width:760px; margin:0 auto;
+    font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--text-dim);}
+  .topbar-inner a:hover{color:var(--accent);}
+  .sep{color:var(--text-faint);}
+  .hero{padding:44px 0 28px; border-bottom:1px solid var(--line); margin-bottom:32px;}
+  .eyebrow{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--c-linux); letter-spacing:.08em; margin-bottom:14px;}
+  .hero h1{font-size:clamp(24px,4vw,32px); font-weight:900; margin-bottom:10px;}
+  .hero p{color:var(--text-dim); font-size:14px;}
+  .content{padding-bottom:70px;}
+  .content h2{font-size:19px; font-weight:700; margin:38px 0 14px; padding-bottom:8px; border-bottom:1px solid var(--line);}
+  .content h3{font-size:15px; font-weight:700; margin:22px 0 8px; color:var(--c-linux);}
+  .content p{font-size:14px; color:var(--text-dim); margin-bottom:10px;}
+  .content ul{margin:0 0 14px 20px; font-size:14px; color:var(--text-dim);}
+  .content li{margin-bottom:4px;}
+  .content li b{color:var(--text);}
+  table{width:100%; border-collapse:collapse; margin:14px 0 20px; font-size:13px;}
+  th, td{border:1px solid var(--panel-border); padding:8px 12px; text-align:left;}
+  th{background:var(--panel); color:var(--text); font-family:'JetBrains Mono',monospace; font-size:12px;}
+  td{color:var(--text-dim);}
+  pre{background:var(--panel); border:1px solid var(--panel-border); border-radius:8px; padding:14px 16px;
+    overflow-x:auto; margin:12px 0; font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--accent); line-height:1.6;}
+  code.mono{background:var(--panel); padding:1px 5px; border-radius:4px; font-size:12.5px;}
+  footer{border-top:1px solid var(--line); padding:24px 0 50px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-faint);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="../../index.html">메인</a><span class="sep">/</span>
+    <a href="../../network.html">서버·네트워크 기초</a><span class="sep">/</span>
+    <span>리눅스 기본 명령어, SQL</span>
+  </div>
+</div>
+
+<div class="wrap">
+  <section class="hero">
+    <div class="eyebrow mono">07 · 리눅스 서버 운영</div>
+    <h1>리눅스 기본 명령어, SQL</h1>
+    <p>패키지 설치·제어, 파일/권한 명령어, 간단한 웹서버 구성, DB 접속과 SQL DDL/DML 기본 문법 정리</p>
+  </section>
+
+  <div class="content">
+
+    <h2>1. 리눅스 기본 명령어</h2>
+
+    <h3>프로그램 설치 & 제어</h3>
+    <pre>yum update -y
+dnf install -y httpd php mariadb-server</pre>
+    <p><code class="mono">yum</code>은 패키지 관리 도구, <code class="mono">dnf</code>는 더 개선된 yum(Dandified YUM). httpd=아파치 웹서버, php=웹 개발 언어, mariadb-server=DB 서버. HTTP는 프로토콜 이름, httpd는 프로그램 이름.</p>
+    <pre>systemctl status [서비스 이름]
+systemctl start [서비스 이름]
+systemctl restart [서비스 이름]</pre>
+    <p>status: active(running)=실행 중, inactive=꺼짐, failed=오류.</p>
+
+    <h3>디렉토리 / 복사</h3>
+    <pre>pwd
+ls -al
+cd
+mkdir [파일명]
+
+cp 원본파일 대상파일
+cp -r dir1 dir2   // 디렉토리는 -r 필수</pre>
+
+    <h3>파일 관련 & 권한</h3>
+    <pre>touch test.txt
+cat test.txt
+head -5 test.txt
+tail -10 test.txt
+less test.txt</pre>
+    <p>cat=이어붙여 출력, head/tail=위/아래 지정 줄만 출력, less=페이지 단위로 천천히(q로 종료).</p>
+    <p>권한: <code class="mono">d/-/l</code> = 디렉토리/일반파일/링크. r(4)/w(2)/x(1), 사용자(User)/그룹(Group)/기타(Other) 순서.</p>
+    <pre>chmod 755 test.txt</pre>
+
+    <h3>계정 생성 / VI 편집기</h3>
+    <pre>useradd [계정이름]
+passwd [비밀번호]</pre>
+    <ul>
+      <li><b>i</b> — 입력 모드 진입</li>
+      <li><b>esc</b> — 명령 모드로 전환</li>
+      <li><b>:wq!</b> — 저장 후 강제 종료</li>
+      <li><b>:set nu</b> — 라인 숫자 표시</li>
+    </ul>
+
+    <h3>방화벽 제어</h3>
+    <pre>systemctl status firewalld
+firewall-cmd --permanent --add-port=80/tcp
+firewall-cmd --reload
+firewall-cmd --list-all</pre>
+    <p><code class="mono">--permanent</code>은 영구 적용(재부팅해도 유지)이지만 파일에만 저장되므로, <code class="mono">--reload</code>로 다시 불러와 실제 적용해야 함.</p>
+
+    <h2>2. 웹 서버 (PHP 테스트)</h2>
+    <pre>vi /var/www/html/phptest.php</pre>
+    <pre>&lt;?php
+phpinfo();
+?&gt;</pre>
+    <p><code class="mono">/var/www/html</code>이 웹페이지 저장소. <code class="mono">http://[IP]/phptest.php</code>로 접속해 확인.</p>
+
+    <h2>3. DB (MariaDB)</h2>
+    <pre>systemctl start mariadb
+mysql_secure_installation</pre>
+    <p>여기서 물어보는 root password는 리눅스 root가 아니라 DB의 root 비밀번호.</p>
+    <pre>mysql -u root -p</pre>
+    <p>원격 접속 시 방화벽에 3306 포트 추가 필요. <code class="mono">(none)</code>은 아직 DB가 선택되지 않은 상태.</p>
+
+    <h2>4. SQL</h2>
+    <h3>DDL — CREATE / ALTER / DROP</h3>
+    <pre>SHOW DATABASES;
+CREATE DATABASE [DB명];
+USE [DB 이름];
+
+CREATE TABLE student ( Date int(4), Phone int(10) );
+SHOW TABLES;
+DESC student;</pre>
+    <pre>ALTER TABLE student ADD Age1 INT(3);
+ALTER TABLE student ADD Address VARCHAR(10) AFTER Date;
+ALTER TABLE student ADD MBTI CHAR(4) FIRST;
+ALTER TABLE student MODIFY Name VARCHAR(10);
+ALTER TABLE student DROP Age1;</pre>
+    <p>AFTER=특정 필드 뒤에 추가, FIRST=맨 앞에 추가, MODIFY=자료형/위치 수정, DROP=필드 제거.</p>
+    <pre>DROP DATABASE [DB명];
+DROP TABLE [테이블명];</pre>
+
+    <h3>DML — INSERT / SELECT / UPDATE / DELETE</h3>
+    <pre>INSERT INTO student VALUES ('Park', 2026, 'Seoul', 12345678, 32);
+INSERT INTO student (Name, Address) VALUES ('Lee', 'Busan');
+
+SELECT * FROM student;
+SELECT Name, Address FROM student;
+
+UPDATE student SET address = 'Daegu' WHERE Name = 'Lee';
+
+DELETE FROM student WHERE Name = 'Hong';</pre>
+    <p>WHERE 절 없이 UPDATE/DELETE 실행하면 전체 행이 대상이 되므로 주의.</p>
+
+  </div>
+
+  <footer>© 2026 조경익 · security learning log</footer>
+</div>
+</body>
+</html>
