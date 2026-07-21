@@ -10,7 +10,8 @@
   :root{
     --bg:#0a0d10; --bg-alt:#0f1318; --panel:#12171d; --panel-border:#212a33;
     --text:#dde4ea; --text-dim:#93a0ac; --text-faint:#5a6470; --accent:#5eead4; --line:#1c242c;
-    --c-network:#6ea8f2; --c-hospital:#c893f2; --c-infra:#f2a94e; --c-web:#5eead4; --c-malware:#f2726b;
+    --c-network:#6ea8f2; --c-web:#5eead4; --c-malware:#f2726b;
+    --c-p1:#c893f2; --c-p2:#f2a94e; --c-p3:#5a6470;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   body{
@@ -33,7 +34,8 @@
   .hero-eyebrow::before{content:''; width:22px; height:1px; background:var(--accent);}
   .hero h1{font-size:clamp(30px, 4.8vw, 48px); font-weight:900; letter-spacing:-0.02em; line-height:1.22; margin-bottom:16px;}
   .hero h1 .hl{color:var(--accent);}
-  .hero p{color:var(--text-dim); font-size:15.5px; max-width:600px; margin-bottom:28px;}
+  .hero p{color:var(--text-dim); font-size:15.5px; max-width:620px; margin-bottom:28px;}
+  .hero p b{color:var(--text); font-weight:600;}
 
   .terminal{background:var(--panel); border:1px solid var(--panel-border); border-radius:10px; overflow:hidden; box-shadow:0 20px 60px -20px rgba(0,0,0,0.6);}
   .terminal-head{display:flex; align-items:center; gap:8px; padding:11px 14px; border-bottom:1px solid var(--panel-border); background:var(--bg-alt);}
@@ -46,30 +48,47 @@
   .caret{display:inline-block; width:7px; height:14px; background:var(--accent); vertical-align:middle; animation:blink 1s step-end infinite;}
   @keyframes blink{0%,50%{opacity:1;} 50.01%,100%{opacity:0;}}
 
-  .path{margin:44px 0 20px; display:flex; align-items:center; gap:10px; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-faint);}
+  .path{margin:48px 0 20px; display:flex; align-items:center; gap:10px; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-faint);}
   .path::after{content:''; flex:1; height:1px; background:var(--line);}
+  .path .h{font-size:16px; font-weight:700; color:var(--text); font-family:'Noto Sans KR',sans-serif;}
 
+  /* project cards */
+  .proj-grid{display:grid; grid-template-columns:repeat(3, 1fr); gap:14px; margin-bottom:56px;}
+  @media (max-width:760px){.proj-grid{grid-template-columns:1fr;}}
+  .proj-card{
+    padding:22px; border-radius:12px; background:var(--panel); border:1px solid var(--panel-border);
+    border-top:3px solid transparent; display:flex; flex-direction:column; gap:10px; min-height:190px;
+    transition:transform .15s, background .15s;
+  }
+  a.proj-card:hover{transform:translateY(-3px); background:#151b22;}
+  .proj-card .stage{font-family:'JetBrains Mono',monospace; font-size:11px; padding:2px 9px; border-radius:20px; align-self:flex-start;}
+  .proj-card .title{font-size:16px; font-weight:700; line-height:1.4;}
+  .proj-card .desc{font-size:13px; color:var(--text-dim); line-height:1.55; flex:1;}
+  .proj-card .status{font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-faint); margin-top:auto;}
+  .proj-card.p1{border-top-color:var(--c-p1);} .proj-card.p1 .stage{color:var(--c-p1); background:color-mix(in srgb, var(--c-p1) 14%, transparent);}
+  .proj-card.p2{border-top-color:var(--c-p2);} .proj-card.p2 .stage{color:var(--c-p2); background:color-mix(in srgb, var(--c-p2) 14%, transparent);}
+  .proj-card.p3{border-top-color:var(--c-p3); opacity:.55;} .proj-card.p3 .stage{color:var(--c-p3); background:color-mix(in srgb, var(--c-p3) 14%, transparent);}
+  .proj-card.p3 .title{color:var(--text-dim);}
+
+  /* learning tiles */
   .tiles{display:flex; flex-direction:column; gap:12px; margin-bottom:60px;}
   .tile{
     display:flex; align-items:center; gap:20px;
-    padding:22px 24px; border-radius:12px; background:var(--panel);
+    padding:20px 24px; border-radius:12px; background:var(--panel);
     border:1px solid var(--panel-border); border-left-width:4px;
     transition:transform .15s, background .15s;
   }
   .tile:hover{transform:translateX(4px); background:#151b22;}
-  .tile .step{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-faint); width:44px; flex-shrink:0;}
-  .tile .emoji{font-size:26px; flex-shrink:0;}
+  .tile .step{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-faint); width:40px; flex-shrink:0;}
+  .tile .emoji{font-size:24px; flex-shrink:0;}
   .tile .body{flex:1; min-width:0;}
-  .tile .title{font-size:17px; font-weight:700; margin-bottom:4px;}
+  .tile .title{font-size:16px; font-weight:700; margin-bottom:4px;}
   .tile .why{font-size:13px; color:var(--text-dim);}
   .tile .meta{display:flex; flex-direction:column; align-items:flex-end; gap:6px; flex-shrink:0;}
   .tile .count{font-family:'JetBrains Mono',monospace; font-size:11px; padding:3px 10px; border-radius:20px; white-space:nowrap;}
   .tile .arrow{font-size:15px; color:var(--text-faint); opacity:0; transition:opacity .15s, transform .15s;}
   .tile:hover .arrow{opacity:1; transform:translateX(3px);}
-
   .tile.network{border-left-color:var(--c-network);} .tile.network .count{color:var(--c-network); background:color-mix(in srgb, var(--c-network) 12%, transparent);}
-  .tile.hospital{border-left-color:var(--c-hospital);} .tile.hospital .count{color:var(--c-hospital); background:color-mix(in srgb, var(--c-hospital) 12%, transparent);}
-  .tile.infra{border-left-color:var(--c-infra);} .tile.infra .count{color:var(--c-infra); background:color-mix(in srgb, var(--c-infra) 12%, transparent);}
   .tile.web{border-left-color:var(--c-web);} .tile.web .count{color:var(--c-web); background:color-mix(in srgb, var(--c-web) 12%, transparent);}
   .tile.malware{border-left-color:var(--c-malware);} .tile.malware .count{color:var(--c-malware); background:color-mix(in srgb, var(--c-malware) 12%, transparent);}
 
@@ -94,7 +113,7 @@
   <section class="hero">
     <div class="hero-eyebrow mono">SECURITY LEARNING LOG</div>
     <h1>네트워크 기초부터 악성코드 분석까지,<br>순서대로 <span class="hl">쌓아온</span> 기록입니다.</h1>
-    <p>배운 순서 그대로 5개 갈래로 나눠 정리했습니다. 각 카드를 누르면 해당 분야의 세부 학습 목록으로 이동합니다.</p>
+    <p><b>이스트캠프 국비과정</b>에서 진행한 팀 프로젝트와 개인 학습 기록을 정리했습니다. 배운 기술을 실전에 적용한 프로젝트부터 살펴보실 수 있습니다.</p>
     <div class="terminal">
       <div class="terminal-head"><span></span><span></span><span></span><span class="lbl">whoami.sh</span></div>
       <div class="terminal-body">
@@ -106,7 +125,30 @@
     </div>
   </section>
 
-  <div class="path mono">LEARNING PATH — OLDEST TO NEWEST</div>
+  <div class="path"><span class="h">🚀 팀 프로젝트</span></div>
+
+  <div class="proj-grid">
+    <a class="proj-card p1" href="#">
+      <span class="stage mono">1차</span>
+      <div class="title">병원 네트워크 인프라 구축</div>
+      <div class="desc">병원 환경을 가정해 GNS3 기반으로 네트워크를 설계하고 구축한 팀 프로젝트</div>
+      <div class="status">2건 정리됨</div>
+    </a>
+    <a class="proj-card p2" href="#">
+      <span class="stage mono">2차</span>
+      <div class="title">넥산게임즈 통합 기업 네트워크 및 보안 시스템 구축 실습</div>
+      <div class="desc">1차 구성에 IPS·방화벽 등 보안 장비를 추가로 붙인 심화 프로젝트</div>
+      <div class="status">정리 중</div>
+    </a>
+    <div class="proj-card p3">
+      <span class="stage mono">3차</span>
+      <div class="title">진행 예정</div>
+      <div class="desc">아직 시작 전인 프로젝트입니다</div>
+      <div class="status">준비중</div>
+    </div>
+  </div>
+
+  <div class="path"><span class="h">📚 학습 기록</span></div>
 
   <div class="tiles">
     <a class="tile network" href="#">
@@ -119,29 +161,9 @@
       <div class="meta"><span class="count">13건</span><span class="arrow">↗</span></div>
     </a>
 
-    <a class="tile hospital" href="#">
-      <span class="step mono">02</span>
-      <span class="emoji">🏥</span>
-      <div class="body">
-        <div class="title">병원 네트워크 인프라 구축</div>
-        <div class="why">배운 기초를 실전에 적용한 팀 단위 네트워크 구축 프로젝트</div>
-      </div>
-      <div class="meta"><span class="count">2건 · 팀</span><span class="arrow">↗</span></div>
-    </a>
-
-    <a class="tile infra" href="#">
-      <span class="step mono">03</span>
-      <span class="emoji">🛡️</span>
-      <div class="body">
-        <div class="title">보안 인프라 구축</div>
-        <div class="why">방화벽, IDS/IPS, 로그 모니터링 등 방어·탐지 관점의 인프라 구성</div>
-      </div>
-      <div class="meta"><span class="count">14건</span><span class="arrow">↗</span></div>
-    </a>
-
     <a class="tile web" href="#">
-      <span class="step mono">04</span>
-      <span class="emoji">⚔️</span>
+      <span class="step mono">02</span>
+      <span class="emoji">🕸️</span>
       <div class="body">
         <div class="title">웹 해킹 / 워게임</div>
         <div class="why">방어에서 공격 관점으로 — 웹 취약점을 직접 찾고 공략하는 실습</div>
@@ -150,7 +172,7 @@
     </a>
 
     <a class="tile malware" href="#">
-      <span class="step mono">05</span>
+      <span class="step mono">03</span>
       <span class="emoji">🦠</span>
       <div class="body">
         <div class="title">악성코드 분석</div>
