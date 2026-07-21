@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DHCP, OSPF — 조경익</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff; --bg-alt:#f5f6f8; --panel:#f7f8fa; --panel-border:#e2e5ea;
+    --text:#1a1f24; --text-dim:#4b5560; --text-faint:#7c8894; --accent:#0f9d8f; --line:#e5e8ec;
+    --c-device:#2563eb;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:radial-gradient(ellipse at top left, rgba(94,234,212,0.06), transparent 45%), var(--bg);
+    color:var(--text); font-family:'Noto Sans KR', sans-serif; line-height:1.7; -webkit-font-smoothing:antialiased;}
+  .mono{font-family:'JetBrains Mono', monospace;}
+  a{color:inherit; text-decoration:none;}
+  .wrap{max-width:760px; margin:0 auto; padding:0 24px;}
+  .topbar{border-bottom:1px solid var(--line); background:rgba(255,255,255,0.9); backdrop-filter:blur(6px);}
+  .topbar-inner{display:flex; align-items:center; gap:16px; padding:14px 24px; max-width:760px; margin:0 auto;
+    font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--text-dim);}
+  .topbar-inner a:hover{color:var(--accent);}
+  .sep{color:var(--text-faint);}
+  .hero{padding:44px 0 28px; border-bottom:1px solid var(--line); margin-bottom:32px;}
+  .eyebrow{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--c-device); letter-spacing:.08em; margin-bottom:14px;}
+  .hero h1{font-size:clamp(24px,4vw,32px); font-weight:900; margin-bottom:10px;}
+  .hero p{color:var(--text-dim); font-size:14px;}
+  .content{padding-bottom:70px;}
+  .content h2{font-size:19px; font-weight:700; margin:38px 0 14px; padding-bottom:8px; border-bottom:1px solid var(--line);}
+  .content h3{font-size:15px; font-weight:700; margin:22px 0 8px; color:var(--c-device);}
+  .content p{font-size:14px; color:var(--text-dim); margin-bottom:10px;}
+  .content ul{margin:0 0 14px 20px; font-size:14px; color:var(--text-dim);}
+  .content li{margin-bottom:4px;}
+  .content li b{color:var(--text);}
+  pre{background:var(--panel); border:1px solid var(--panel-border); border-radius:8px; padding:14px 16px;
+    overflow-x:auto; margin:12px 0; font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--accent); line-height:1.6;}
+  code.mono{background:var(--panel); padding:1px 5px; border-radius:4px; font-size:12.5px;}
+  footer{border-top:1px solid var(--line); padding:24px 0 50px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-faint);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="../../index.html">메인</a><span class="sep">/</span>
+    <a href="../../network.html">서버·네트워크 기초</a><span class="sep">/</span>
+    <span>DHCP, OSPF</span>
+  </div>
+</div>
+
+<div class="wrap">
+  <section class="hero">
+    <div class="eyebrow mono">04 · 네트워크 장비 설정</div>
+    <h1>DHCP, OSPF</h1>
+    <p>IP 자동 할당 프로토콜과 최단 경로 기반 동적 라우팅 프로토콜 정리</p>
+  </section>
+
+  <div class="content">
+
+    <h2>1. DHCP</h2>
+    <h3>정의</h3>
+    <ul>
+      <li>자동으로 IP 주소를 할당해주는 프로토콜</li>
+      <li>네트워크에 필요한 기본 정보를 전부 자동 설정</li>
+    </ul>
+
+    <h3>동작 흐름</h3>
+    <ul>
+      <li>PC가 IP 요청 (DHCP Discover)</li>
+      <li>DHCP 서버가 제안 (Offer)</li>
+      <li>PC가 선택 (Request)</li>
+      <li>서버가 확정 (ACK)</li>
+    </ul>
+
+    <h3>설정 방법</h3>
+    <pre>service dhcp
+
+ip dhcp excluded-address 192.168.100.101 192.168.100.110
+
+ip dhcp pool test
+ network 192.168.100.0 255.255.255.0
+ default-router 192.168.100.254
+ dns-server 8.8.8.8</pre>
+    <p>라우터를 DHCP 서버로 사용하겠다고 선언 후, <code class="mono">excluded-address</code>로 제외할 IP 범위를 지정. <code class="mono">ip dhcp pool</code>로 나눠줄 IP 대역의 이름을 지정하고 설정모드 진입, <code class="mono">network</code>로 PC들이 받을 IP 범위, <code class="mono">default-router</code>로 라우터 자신의 IP, <code class="mono">dns-server</code>로 DNS 서버를 설정.</p>
+
+    <h3>설정 확인</h3>
+    <pre>show ip dhcp binding    // 어떤 MAC 주소에 어떤 IP가 할당됐는지 확인
+show ip dhcp conflict   // IP 충돌 발생 시 확인</pre>
+
+    <h2>2. OSPF (Open Shortest Path First)</h2>
+    <h3>정의</h3>
+    <ul>
+      <li>최단 경로를 계산해서 라우팅하는 프로토콜</li>
+      <li>RIP보다 빠르며, 이름처럼 속도보다는 정확하게 최단 경로를 계산하는 게 핵심</li>
+    </ul>
+
+    <h3>핵심 구조</h3>
+    <ul>
+      <li>네트워크를 구역(Area)으로 나눔</li>
+      <li>Area 0 (백본 영역) — 필수</li>
+      <li>Area 1, 2, 3 — 선택</li>
+      <li>모든 Area는 반드시 Area 0과 연결되어야 함</li>
+    </ul>
+
+    <h3>설정 방법</h3>
+    <pre>router ospf 10
+
+network 10.10.10.0 0.0.0.255 area 0</pre>
+    <p><code class="mono">router ospf [프로세스 ID]</code>는 각 라우터마다 값이 달라도 되며(AS 번호와 다름), 설정 모드로 진입. <code class="mono">network [네트워크 주소] [와일드 마스크] area [번호]</code>로 광고할 네트워크 대역을 설정. 별도로 <code class="mono">no auto-summary</code>는 필요 없음.</p>
+
+  </div>
+
+  <footer>© 2026 조경익 · security learning log</footer>
+</div>
+</body>
+</html>
