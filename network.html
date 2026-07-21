@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>서버 / 네트워크 기초 — 조경익</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0d10; --bg-alt:#0f1318; --panel:#12171d; --panel-border:#212a33;
+    --text:#dde4ea; --text-dim:#93a0ac; --text-faint:#5a6470; --accent:#5eead4; --line:#1c242c;
+    --c-device:#6ea8f2; --c-linux:#7ee787; --c-service:#f2a94e; --c-cloud:#c893f2;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:radial-gradient(ellipse at top left, rgba(94,234,212,0.06), transparent 45%),
+      radial-gradient(ellipse at 80% 0%, rgba(242,169,78,0.05), transparent 40%), var(--bg);
+    color:var(--text); font-family:'Noto Sans KR', sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:'JetBrains Mono', monospace;}
+  a{color:inherit; text-decoration:none;}
+  .wrap{max-width:1040px; margin:0 auto; padding:0 24px;}
+
+  .topbar{border-bottom:1px solid var(--line); background:rgba(10,13,16,0.85); backdrop-filter:blur(6px);}
+  .topbar-inner{display:flex; align-items:center; justify-content:space-between; padding:14px 24px; max-width:1040px; margin:0 auto;}
+  .back{font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--text-dim); display:flex; align-items:center; gap:6px;}
+  .back:hover{color:var(--accent);}
+  .brand{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-faint);}
+
+  .hero{padding:52px 0 8px;}
+  .hero-eyebrow{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--accent); letter-spacing:.08em; display:flex; align-items:center; gap:10px; margin-bottom:16px;}
+  .hero-eyebrow::before{content:''; width:22px; height:1px; background:var(--accent);}
+  .hero h1{font-size:clamp(26px, 4vw, 38px); font-weight:900; letter-spacing:-0.02em; margin-bottom:12px;}
+  .hero p{color:var(--text-dim); font-size:14.5px; max-width:640px;}
+
+  .stats{display:flex; gap:10px; margin:28px 0 48px; flex-wrap:wrap;}
+  .stat-chip{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-dim); border:1px solid var(--panel-border); background:var(--panel); padding:6px 14px; border-radius:20px;}
+  .stat-chip b{color:var(--accent);}
+
+  .subsection{margin-bottom:48px;}
+  .sub-head{display:flex; align-items:center; gap:12px; margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid var(--line);}
+  .sub-head .emoji{font-size:20px;}
+  .sub-head h2{font-size:17px; font-weight:700;}
+  .sub-head .count{margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-faint); border:1px solid var(--panel-border); padding:2px 9px; border-radius:20px;}
+
+  .grid{display:grid; grid-template-columns:repeat(3, 1fr); gap:12px;}
+  @media (max-width:860px){.grid{grid-template-columns:repeat(2, 1fr);}}
+  @media (max-width:560px){.grid{grid-template-columns:1fr;}}
+
+  /* flow (vertical, with connector) */
+  .flow{display:flex; flex-direction:column; max-width:640px;}
+  .flow .card{min-height:auto;}
+  .flow-connector{display:flex; align-items:center; gap:10px; padding:10px 0 10px 20px; font-size:12px; color:var(--text-dim);}
+  .flow-connector .arrow{color:var(--c-device); font-size:14px; flex-shrink:0;}
+
+  .card{
+    display:flex; flex-direction:column; gap:8px; min-height:120px;
+    padding:14px 16px; border-radius:10px; background:var(--panel);
+    border:1px solid var(--panel-border); border-left:3px solid transparent;
+    transition:transform .15s, border-color .15s, background .15s;
+  }
+  a.card:hover{transform:translateY(-2px); background:#151b22;}
+  .card .top-row{display:flex; align-items:center; justify-content:space-between; gap:8px;}
+  .card .tag{font-family:'JetBrains Mono',monospace; font-size:10px; padding:2px 7px; border-radius:4px; white-space:nowrap;}
+  .card .arrow{font-size:12px; color:var(--text-faint); opacity:0; transition:opacity .15s;}
+  a.card:hover .arrow{opacity:1;}
+  .card .title{font-size:14px; font-weight:600; line-height:1.4;}
+  .card .desc{font-size:12.5px; color:var(--text-dim); line-height:1.55; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;}
+
+  #device .card{border-left-color:var(--c-device);} #device .tag{color:var(--c-device); background:color-mix(in srgb, var(--c-device) 12%, transparent); border:1px solid color-mix(in srgb, var(--c-device) 30%, transparent);}
+  #linux .card{border-left-color:var(--c-linux);} #linux .tag{color:var(--c-linux); background:color-mix(in srgb, var(--c-linux) 12%, transparent); border:1px solid color-mix(in srgb, var(--c-linux) 30%, transparent);}
+  #service .card{border-left-color:var(--c-service);} #service .tag{color:var(--c-service); background:color-mix(in srgb, var(--c-service) 12%, transparent); border:1px solid color-mix(in srgb, var(--c-service) 30%, transparent);}
+  #cloud .card{border-left-color:var(--c-cloud);} #cloud .tag{color:var(--c-cloud); background:color-mix(in srgb, var(--c-cloud) 12%, transparent); border:1px solid color-mix(in srgb, var(--c-cloud) 30%, transparent);}
+
+  footer{border-top:1px solid var(--line); padding:30px 0 60px; display:flex; justify-content:space-between; align-items:center;
+    font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-faint);}
+  footer a:hover{color:var(--accent);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="index.html">← 메인으로</a>
+    <span class="brand">terran1234@security-log</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <section class="hero">
+    <div class="hero-eyebrow mono">01 — LEARNING RECORD</div>
+    <h1>🖥️ 서버 / 네트워크 기초</h1>
+    <p>Cisco 장비 설정부터 리눅스 서버 운영, 서비스 구축, 클라우드/DB까지 — 이후 모든 실습의 토대가 된 기본기입니다.</p>
+    <div class="stats">
+      <span class="stat-chip"><b>13</b>건</span>
+      <span class="stat-chip"><b>4</b>개 소분류</span>
+    </div>
+  </section>
+
+  <div class="subsection" id="device">
+    <div class="sub-head"><span class="emoji">🔧</span><h2>네트워크 장비 설정</h2><span class="count">6건</span></div>
+    <div class="flow">
+      <a class="card" href="https://app.notion.com/p/338e4b21e2d082ff93728182819448fa?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">01</span><span class="arrow">↗</span></div><div class="title">패킷 트레이서 기초</div><div class="desc">OSI 계층, 사설 IP, IPv4/IPv6/MAC 비교와 기본 장비 명령어</div></a>
+      <div class="flow-connector"><span class="arrow">↓</span><span>장비 다루는 법을 익혔으니, 이제 네트워크를 나눠본다</span></div>
+
+      <a class="card" href="https://app.notion.com/p/VLAN-9bce4b21e2d083088ddc816e57744fbd?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">02</span><span class="arrow">↗</span></div><div class="title">VLAN 설정</div><div class="desc">서브넷 계산, VLAN·Trunk·VTP·서브 인터페이스 구성</div></a>
+      <div class="flow-connector"><span class="arrow">↓</span><span>나눈 네트워크들을 다시 연결할 방법이 필요하다</span></div>
+
+      <a class="card" href="https://app.notion.com/p/0aee4b21e2d0823b86c3012c203ecc7e?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">03</span><span class="arrow">↗</span></div><div class="title">라우팅 설정</div><div class="desc">정적/동적 라우팅, AD·Metric 개념, RIP·EIGRP 설정</div></a>
+      <div class="flow-connector"><span class="arrow">↓</span><span>매번 수동 설정은 비효율적 — 자동화가 필요하다</span></div>
+
+      <a class="card" href="https://app.notion.com/p/DHCP-OSRF-651e4b21e2d08294be13019abd9f6975?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">04</span><span class="arrow">↗</span></div><div class="title">DHCP, OSPF</div><div class="desc">IP 자동 할당과 최단 경로 기반 동적 라우팅 프로토콜</div></a>
+      <div class="flow-connector"><span class="arrow">↓</span><span>이제 트래픽을 통제하고 걸러낼 차례</span></div>
+
+      <a class="card" href="https://app.notion.com/p/ASL-NAT-329e4b21e2d082e4b50d811ba477275f?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">05</span><span class="arrow">↗</span></div><div class="title">ACL, NAT</div><div class="desc">접근 제어 목록으로 트래픽 필터링, 사설·공인 IP 주소 변환</div></a>
+      <div class="flow-connector"><span class="arrow">↓</span><span>마지막으로, 이 모든 통신을 암호화해서 보호한다</span></div>
+
+      <a class="card" href="https://app.notion.com/p/VPN-af6e4b21e2d08325bbb48100a7b447cc?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">06</span><span class="arrow">↗</span></div><div class="title">VPN, 터널링, IPSec</div><div class="desc">GRE 터널링과 IPSec/ISAKMP 기반 site-to-site VPN 구성</div></a>
+    </div>
+  </div>
+
+  <div class="subsection" id="linux">
+    <div class="sub-head"><span class="emoji">🐧</span><h2>리눅스 서버 운영</h2><span class="count">4건</span></div>
+    <div class="grid">
+      <a class="card" href="https://app.notion.com/p/SQL-ceee4b21e2d08308a689017c8a56c223?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">linux</span><span class="arrow">↗</span></div><div class="title">리눅스 기본 명령어, SQL</div><div class="desc">패키지 관리, 파일·권한 명령어와 SQL DDL/DML 기본 문법</div></a>
+      <a class="card" href="https://app.notion.com/p/0e1e4b21e2d08390974201d30ee114f3?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">linux</span><span class="arrow">↗</span></div><div class="title">리눅스 계정 관리</div><div class="desc">계정 정보 구조, 권한(umask), 파일 검색·삭제, 히스토리 확인</div></a>
+      <a class="card" href="https://app.notion.com/p/754e4b21e2d082c6b493016ff96dc5e5?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">linux</span><span class="arrow">↗</span></div><div class="title">자원 공유</div><div class="desc">NFS로 네트워크 폴더 공유, Samba로 윈도우와 파일 공유</div></a>
+      <a class="card" href="https://app.notion.com/p/LOG-4dfe4b21e2d0823e939a01980f7bca53?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">linux</span><span class="arrow">↗</span></div><div class="title">LOG</div><div class="desc">rsyslog 서버·DB 연동, LogAnalyzer 웹 시각화, grep 활용</div></a>
+    </div>
+  </div>
+
+  <div class="subsection" id="service">
+    <div class="sub-head"><span class="emoji">🌐</span><h2>서비스 구축</h2><span class="count">2건</span></div>
+    <div class="grid">
+      <a class="card" href="https://app.notion.com/p/HTTPS-FTP-DNS-8aae4b21e2d083ae820e8140ab9a3f26?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">service</span><span class="arrow">↗</span></div><div class="title">HTTP, HTTPS, FTP, DNS</div><div class="desc">아파치·SSL 인증서·vsftpd·BIND로 4가지 핵심 서버 구축</div></a>
+      <a class="card" href="https://app.notion.com/p/2022-86de4b21e2d0834bb86001c30e65d862?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">service</span><span class="arrow">↗</span></div><div class="title">윈도우 서버 2022, 패스워드 정책</div><div class="desc">IIS로 FTP·DNS 구축, 리눅스 비밀번호 복잡도 정책 설정</div></a>
+    </div>
+  </div>
+
+  <div class="subsection" id="cloud">
+    <div class="sub-head"><span class="emoji">☁️</span><h2>클라우드 / DB</h2><span class="count">1건</span></div>
+    <div class="grid">
+      <a class="card" href="https://app.notion.com/p/DB-715e4b21e2d083188ed68146ac70a36d?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">cloud</span><span class="arrow">↗</span></div><div class="title">클라우드, 커널 설정, DB 복제</div><div class="desc">IaaS/PaaS/SaaS 개념, 커널 파라미터 설정, MariaDB Master-Slave 복제</div></a>
+    </div>
+  </div>
+
+  <footer>
+    <span>© 2026 조경익 · security learning log</span>
+    <a href="https://github.com/terran1234" target="_blank">github.com/terran1234</a>
+  </footer>
+
+</div>
+</body>
+</html>
