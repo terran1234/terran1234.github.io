@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VPN, 터널링, IPSec — 조경익</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff; --bg-alt:#f5f6f8; --panel:#f7f8fa; --panel-border:#e2e5ea;
+    --text:#1a1f24; --text-dim:#4b5560; --text-faint:#7c8894; --accent:#0f9d8f; --line:#e5e8ec;
+    --c-device:#2563eb;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:radial-gradient(ellipse at top left, rgba(94,234,212,0.06), transparent 45%), var(--bg);
+    color:var(--text); font-family:'Noto Sans KR', sans-serif; line-height:1.7; -webkit-font-smoothing:antialiased;}
+  .mono{font-family:'JetBrains Mono', monospace;}
+  a{color:inherit; text-decoration:none;}
+  .wrap{max-width:760px; margin:0 auto; padding:0 24px;}
+  .topbar{border-bottom:1px solid var(--line); background:rgba(255,255,255,0.9); backdrop-filter:blur(6px);}
+  .topbar-inner{display:flex; align-items:center; gap:16px; padding:14px 24px; max-width:760px; margin:0 auto;
+    font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--text-dim);}
+  .topbar-inner a:hover{color:var(--accent);}
+  .sep{color:var(--text-faint);}
+  .hero{padding:44px 0 28px; border-bottom:1px solid var(--line); margin-bottom:32px;}
+  .eyebrow{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--c-device); letter-spacing:.08em; margin-bottom:14px;}
+  .hero h1{font-size:clamp(24px,4vw,32px); font-weight:900; margin-bottom:10px;}
+  .hero p{color:var(--text-dim); font-size:14px;}
+  .content{padding-bottom:70px;}
+  .content h2{font-size:19px; font-weight:700; margin:38px 0 14px; padding-bottom:8px; border-bottom:1px solid var(--line);}
+  .content h3{font-size:15px; font-weight:700; margin:22px 0 8px; color:var(--c-device);}
+  .content p{font-size:14px; color:var(--text-dim); margin-bottom:10px;}
+  .content ul{margin:0 0 14px 20px; font-size:14px; color:var(--text-dim);}
+  .content li{margin-bottom:4px;}
+  .content li b{color:var(--text);}
+  pre{background:var(--panel); border:1px solid var(--panel-border); border-radius:8px; padding:14px 16px;
+    overflow-x:auto; margin:12px 0; font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--accent); line-height:1.6;}
+  code.mono{background:var(--panel); padding:1px 5px; border-radius:4px; font-size:12.5px;}
+  .img-placeholder{display:flex; align-items:center; gap:8px; background:var(--panel); border:1px dashed var(--panel-border);
+    border-radius:8px; padding:12px 14px; margin:10px 0; font-size:12px; color:var(--text-faint); font-family:'JetBrains Mono',monospace;}
+  footer{border-top:1px solid var(--line); padding:24px 0 50px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-faint);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="../../index.html">메인</a><span class="sep">/</span>
+    <a href="../../network.html">서버·네트워크 기초</a><span class="sep">/</span>
+    <span>VPN, 터널링, IPSec</span>
+  </div>
+</div>
+
+<div class="wrap">
+  <section class="hero">
+    <div class="eyebrow mono">06 · 네트워크 장비 설정</div>
+    <h1>VPN, 터널링, IPSec</h1>
+    <p>GRE 터널링과 IPSec/ISAKMP 기반 site-to-site VPN 구성 정리</p>
+  </section>
+
+  <div class="content">
+
+    <h2>1. VPN (Virtual Private Network)</h2>
+    <p>인터넷 같은 공용망 위에서 안전하게 통신하기 위해 암호화된 가상 사설망을 만드는 기술.</p>
+    <ul>
+      <li><b>Site-to-Site VPN</b> — 네트워크↔네트워크 + 암호화. 본사↔지사처럼 두 LAN을 인터넷 위 암호화된 가상 터널로 연결</li>
+      <li><b>GRE (Generic Routing Encapsulation)</b> — 서로 다른 네트워크 간 데이터를 캡슐화해 터널 형태로 전달하는 프로토콜. 암호화는 안 하고 터널(길)만 만들어줌</li>
+      <li><b>IPSec</b> — IP 계층에서 데이터를 암호화·인증해 안전하게 통신하는 보안 프로토콜. 멀티캐스트가 안 되서 동적 라우팅에 못 쓰므로 GRE로 감싸서 전송</li>
+    </ul>
+
+    <h2>2. 터널링 설정 (Site-to-Site, GRE)</h2>
+    <pre>interface tunnel 100
+ip address 10.10.10.10 255.255.255.0
+
+tunnel mode gre ip
+
+tunnel source [출발지 인터페이스]
+tunnel destination [목적지 물리 IP 주소]
+
+ip route 172.16.0.0 255.255.255.0 10.10.10.20</pre>
+    <p>가상 터널 인터페이스를 만들고 IP를 부여(터널 번호는 양쪽이 같을 필요 없음) → 캡슐화 방식(GRE) 지정 → 터널 시작/끝 위치 지정 → 터널을 통해 갈 목적지 경로 추가. 반대편 라우터에도 동일하게 설정.</p>
+    <div class="img-placeholder">🖼 스크린샷 자리 — 터널링 설정 후 통신 확인</div>
+    <p>터널링 설정 후에는 물리 회선이 아닌 가상 회선을 통해 통신하는 걸 확인할 수 있음. 실제로는 물리 회선을 타지만 중간 경로를 은닉하는 효과(보안성 자체를 높이는 건 아님).</p>
+    <pre>show ip interface tunnel 100</pre>
+
+    <h2>3. VPN Site-to-Site 설정 (IPSec)</h2>
+    <p>큰 흐름: 암호화할 트래픽 지정(access-list) → ISAKMP 정책 생성(인증/암호화/해시 방식) → 상대와 쓸 키·대상 지정(crypto isakmp key) → 데이터 암호화 방식 지정(crypto transform-set) → 위 설정들을 하나로 묶기(crypto map) → 실제 인터페이스에 적용.</p>
+    <pre>// 본사 라우터 (괄호 안은 지사 라우터 값)
+access-list 100 permit gre host 1.1.1.1 host 2.2.2.1
+access-list 100 permit gre 192.168.100.0 0.0.0.255 host 2.2.2.1
+
+crypto isakmp policy 10
+authentication pre-share
+encryption 3des
+hash md5
+crypto isakmp key 1234 address 2.2.2.1
+crypto ipsec transform-set test esp-3des esp-md5-hmac
+
+crypto map vpn-map 10 ipsec-isakmp
+match address 100
+set peer 2.2.2.1
+set transform-set test
+
+interface s0/3/0
+crypto map vpn-map</pre>
+    <p>세밀한 제어를 위해 access-list로 암호화할 트래픽을 지정. IPSec(암호화)는 실제 공인 IP(물리 인터페이스) 기준으로 동작. ISAKMP는 준비 단계, IPSec은 실제 데이터 암호화 단계. <code class="mono">authentication pre-share</code>는 미리 정한 비밀번호로 상호 인증하는 방식이며, <code class="mono">crypto isakmp key</code>로 누구와 키를 쓸지 지정. <code class="mono">esp</code>는 실제 데이터 보호 방식(IPSec 프로토콜). 반대편 라우터에도 동일하게 설정 필요.</p>
+    <pre>show crypto ipsec sa</pre>
+    <p>encaps / decaps 숫자가 올라가는지로 정상 동작 여부 확인.</p>
+
+  </div>
+
+  <footer>© 2026 조경익 · security learning log</footer>
+</div>
+</body>
+</html>
