@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>웹 해킹 / 워게임 — 조경익</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0d10; --bg-alt:#0f1318; --panel:#12171d; --panel-border:#212a33;
+    --text:#dde4ea; --text-dim:#aab6c2; --text-faint:#7c8894; --accent:#5eead4; --line:#1c242c;
+    --c-wargame:#f2726b; --c-practice:#5eead4; --c-concept:#c893f2;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:radial-gradient(ellipse at top left, rgba(94,234,212,0.06), transparent 45%),
+      radial-gradient(ellipse at 80% 0%, rgba(242,169,78,0.05), transparent 40%), var(--bg);
+    color:var(--text); font-family:'Noto Sans KR', sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:'JetBrains Mono', monospace;}
+  a{color:inherit; text-decoration:none;}
+  .wrap{max-width:1040px; margin:0 auto; padding:0 24px;}
+
+  .topbar{border-bottom:1px solid var(--line); background:rgba(10,13,16,0.85); backdrop-filter:blur(6px);}
+  .topbar-inner{display:flex; align-items:center; justify-content:space-between; padding:14px 24px; max-width:1040px; margin:0 auto;}
+  .back{font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--text-dim); display:flex; align-items:center; gap:6px;}
+  .back:hover{color:var(--accent);}
+  .brand{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-faint);}
+
+  .hero{padding:52px 0 8px;}
+  .hero-eyebrow{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--accent); letter-spacing:.08em; display:flex; align-items:center; gap:10px; margin-bottom:16px;}
+  .hero-eyebrow::before{content:''; width:22px; height:1px; background:var(--accent);}
+  .hero h1{font-size:clamp(26px, 4vw, 38px); font-weight:900; letter-spacing:-0.02em; margin-bottom:12px;}
+  .hero p{color:var(--text-dim); font-size:14.5px; max-width:640px;}
+
+  .stats{display:flex; gap:10px; margin:28px 0 48px; flex-wrap:wrap;}
+  .stat-chip{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-dim); border:1px solid var(--panel-border); background:var(--panel); padding:6px 14px; border-radius:20px;}
+  .stat-chip b{color:var(--accent);}
+
+  .subsection{margin-bottom:48px;}
+  .sub-head{margin-bottom:16px; padding-bottom:12px; border-bottom:1px solid var(--line);}
+  .sub-head-top{display:flex; align-items:center; gap:12px;}
+  .sub-head .emoji{font-size:20px;}
+  .sub-head h2{font-size:17px; font-weight:700;}
+  .sub-head .count{margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:11px; color:var(--text-faint); border:1px solid var(--panel-border); padding:2px 9px; border-radius:20px;}
+  .sub-head .why{font-size:12.5px; color:var(--text-dim); margin-top:8px;}
+
+  .grid{display:grid; grid-template-columns:repeat(3, 1fr); gap:12px;}
+  @media (max-width:860px){.grid{grid-template-columns:repeat(2, 1fr);}}
+  @media (max-width:560px){.grid{grid-template-columns:1fr;}}
+
+  .card{
+    display:flex; flex-direction:column; gap:8px; min-height:120px;
+    padding:14px 16px; border-radius:10px; background:var(--panel);
+    border:1px solid var(--panel-border); border-left:3px solid transparent;
+    transition:transform .15s, border-color .15s, background .15s;
+  }
+  a.card:hover{transform:translateY(-2px); background:#151b22;}
+  .card .top-row{display:flex; align-items:center; justify-content:space-between; gap:8px;}
+  .card .tag{font-family:'JetBrains Mono',monospace; font-size:10px; padding:2px 7px; border-radius:4px; white-space:nowrap;}
+  .card .arrow{font-size:12px; color:var(--text-faint); opacity:0; transition:opacity .15s;}
+  a.card:hover .arrow{opacity:1;}
+  .card .title{font-size:14px; font-weight:600; line-height:1.4;}
+  .card .desc{font-size:12.5px; color:var(--text-dim); line-height:1.55; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden;}
+
+  #wargame .card{border-left-color:var(--c-wargame);} #wargame .tag{color:var(--c-wargame); background:color-mix(in srgb, var(--c-wargame) 12%, transparent); border:1px solid color-mix(in srgb, var(--c-wargame) 30%, transparent);}
+  #practice .card{border-left-color:var(--c-practice);} #practice .tag{color:var(--c-practice); background:color-mix(in srgb, var(--c-practice) 12%, transparent); border:1px solid color-mix(in srgb, var(--c-practice) 30%, transparent);}
+  #concept .card{border-left-color:var(--c-concept);} #concept .tag{color:var(--c-concept); background:color-mix(in srgb, var(--c-concept) 12%, transparent); border:1px solid color-mix(in srgb, var(--c-concept) 30%, transparent);}
+
+  footer{border-top:1px solid var(--line); padding:30px 0 60px; display:flex; justify-content:space-between; align-items:center;
+    font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-faint);}
+  footer a:hover{color:var(--accent);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a class="back" href="index.html">← 메인으로</a>
+    <span class="brand">terran1234@security-log</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <section class="hero">
+    <div class="hero-eyebrow mono">02 — LEARNING RECORD</div>
+    <h1>🕸️ 웹 해킹 / 워게임</h1>
+    <p>네트워크 기초를 다진 뒤, 방어에서 공격 관점으로 넘어가 웹 취약점을 직접 찾고 공략한 실습 기록입니다.</p>
+    <div class="stats">
+      <span class="stat-chip"><b>13</b>건</span>
+      <span class="stat-chip"><b>3</b>개 소분류</span>
+    </div>
+  </section>
+
+  <div class="subsection" id="wargame">
+    <div class="sub-head">
+      <div class="sub-head-top"><span class="emoji">🎯</span><h2>워게임 & VM 풀이</h2><span class="count">6건</span></div>
+      <div class="why">실제 취약점이 세팅된 사이트·가상머신을 대상으로 직접 문제를 풀며 익힌 실전 기록</div>
+    </div>
+    <div class="grid">
+      <a class="card" href="https://app.notion.com/p/overthewire-bb8e4b21e2d083798d4b018cb9922038?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">wargame</span><span class="arrow">↗</span></div><div class="title">overthewire</div><div class="desc">SSH로 서버에 접속해 권한 상승 문제를 단계별로 푸는 리눅스 워게임</div></a>
+      <a class="card" href="https://app.notion.com/p/Webhacking-kr-a5de4b21e2d0823886ca81d994131506?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">wargame</span><span class="arrow">↗</span></div><div class="title">Webhacking.kr</div><div class="desc">국내 대표 웹 해킹 워게임에서 다양한 웹 취약점을 실전처럼 연습</div></a>
+      <a class="card" href="https://app.notion.com/p/Webhacking-kr-2-1e1e4b21e2d08357a09981a6a8134e70?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">wargame</span><span class="arrow">↗</span></div><div class="title">Webhacking.kr - 2</div><div class="desc">Webhacking.kr 심화 문제를 이어서 풀이한 기록</div></a>
+      <a class="card" href="https://app.notion.com/p/WarGame-857e4b21e2d083ee8b5b018bea94a8c9?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">wargame</span><span class="arrow">↗</span></div><div class="title">WarGame</div><div class="desc">여러 워게임 플랫폼을 돌며 웹 취약점을 종합적으로 연습</div></a>
+      <a class="card" href="https://app.notion.com/p/VM-2ece4b21e2d083b0843481ec094dce63?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">VM</span><span class="arrow">↗</span></div><div class="title">웹취약점 VM 풀이</div><div class="desc">가상머신에 세팅된 웹 서버를 대상으로 실제 취약점을 찾아 공격</div></a>
+      <a class="card" href="https://app.notion.com/p/drunk_admin_hacking-7e4e4b21e2d083a0b7a401fc9ba82272?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">VM</span><span class="arrow">↗</span></div><div class="title">취약한 머신 — drunk_admin_hacking</div><div class="desc">VulnHub 취약 머신을 뚫고 웹쉘로 권한을 획득하는 실습</div></a>
+    </div>
+  </div>
+
+  <div class="subsection" id="practice">
+    <div class="sub-head">
+      <div class="sub-head-top"><span class="emoji">🧪</span><h2>실습 플랫폼</h2><span class="count">5건</span></div>
+      <div class="why">bWAPP·DVWA처럼 취약점 유형별로 구조화된 실습 플랫폼에서 개념을 익힌 기록</div>
+    </div>
+    <div class="grid">
+      <a class="card" href="https://app.notion.com/p/webgoat-WAP-682e4b21e2d082a8a6cd01c53d2941ea?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">practice</span><span class="arrow">↗</span></div><div class="title">webgoat, WAP</div><div class="desc">OWASP 제공 실습 플랫폼으로 웹 취약점의 원리를 학습</div></a>
+      <a class="card" href="https://app.notion.com/p/bwapp-A6-A7-51ee4b21e2d08328ab2e8122187fa1e9?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">bwapp</span><span class="arrow">↗</span></div><div class="title">bwapp A6 — 민감한 데이터 노출, A7 — 접근 제어 미흡</div><div class="desc">민감 데이터 노출과 기능별 접근 제어 미흡 취약점을 직접 재현</div></a>
+      <a class="card" href="https://app.notion.com/p/bwapp-A5-6f6e4b21e2d0821ca0c681287caa9d24?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">bwapp</span><span class="arrow">↗</span></div><div class="title">bwapp A5 — 보안 설정 오류</div><div class="desc">서버·프레임워크 설정 실수로 발생하는 취약점을 분석</div></a>
+      <a class="card" href="https://app.notion.com/p/beebox-6fae4b21e2d08398a39981bce540478c?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">practice</span><span class="arrow">↗</span></div><div class="title">beebox</div><div class="desc">bWAPP 전용 가상머신 환경에서 다양한 웹 취약점 실습</div></a>
+      <a class="card" href="https://app.notion.com/p/ISMS-P-DVWA-2cae4b21e2d0822f9525811bbf863081?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">practice</span><span class="arrow">↗</span></div><div class="title">ISMS-P, 웹해킹(DVWA)</div><div class="desc">보안 인증 기준을 공부하며 DVWA로 웹 취약점 실습 병행</div></a>
+    </div>
+  </div>
+
+  <div class="subsection" id="concept">
+    <div class="sub-head">
+      <div class="sub-head-top"><span class="emoji">📖</span><h2>개념 정리</h2><span class="count">2건</span></div>
+      <div class="why">실습이 아니라 원리 자체를 파고들어 정리한 이론 노트</div>
+    </div>
+    <div class="grid">
+      <a class="card" href="https://app.notion.com/p/SSL-TLS-7a8e4b21e2d0831a9888010c69f0de8c?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">note</span><span class="arrow">↗</span></div><div class="title">SSL / TLS 정리</div><div class="desc">암호화 통신의 원리와 SSL/TLS 핸드셰이크 과정 정리</div></a>
+      <a class="card" href="https://app.notion.com/p/Buffer-Overflow-d7fe4b21e2d0820b9e5501f9d69a7af4?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">note</span><span class="arrow">↗</span></div><div class="title">Buffer Overflow</div><div class="desc">메모리 취약점의 기본 원리와 오버플로우 공격 실습</div></a>
+    </div>
+  </div>
+
+  <footer>
+    <span>© 2026 조경익 · security learning log</span>
+    <a href="https://github.com/terran1234" target="_blank">github.com/terran1234</a>
+  </footer>
+
+</div>
+</body>
+</html>
