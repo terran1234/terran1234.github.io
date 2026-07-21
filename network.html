@@ -51,7 +51,7 @@
   /* flow (vertical, with connector) */
   .flow{display:flex; flex-direction:column; max-width:640px;}
   .flow .card{min-height:auto;}
-  .flow-connector{display:flex; flex-direction:column; align-items:center; gap:2px; padding:12px 0; font-size:12px; color:var(--text-dim); text-align:center;}
+  .flow-connector{display:flex; align-items:center; gap:10px; padding:10px 0 10px 20px; font-size:12px; color:var(--text-faint);}
   .flow-connector .arrow{color:var(--c-device); font-size:14px; flex-shrink:0;}
 
   .card{
@@ -105,44 +105,44 @@
       <a class="card" href="pages/network/packet-tracer.html"><div class="top-row"><span class="tag">01</span><span class="arrow">↗</span></div><div class="title">패킷 트레이서 기초</div><div class="desc">OSI 계층, 사설 IP, IPv4/IPv6/MAC 비교와 기본 장비 명령어</div></a>
       <div class="flow-connector"><span class="arrow">↓</span><span>장비 다루는 법을 익혔으니, 이제 네트워크를 나눠본다</span></div>
 
-      <a class="card" href="https://app.notion.com/p/VLAN-9bce4b21e2d083088ddc816e57744fbd?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">02</span><span class="arrow">↗</span></div><div class="title">VLAN 설정</div><div class="desc">서브넷 계산, VLAN·Trunk·VTP·서브 인터페이스 구성</div></a>
+      <a class="card" href="pages/network/vlan.html"><div class="top-row"><span class="tag">02</span><span class="arrow">↗</span></div><div class="title">VLAN 설정</div><div class="desc">서브넷 계산, VLAN·Trunk·VTP·서브 인터페이스 구성</div></a>
       <div class="flow-connector"><span class="arrow">↓</span><span>나눈 네트워크들을 다시 연결할 방법이 필요하다</span></div>
 
-      <a class="card" href="https://app.notion.com/p/0aee4b21e2d0823b86c3012c203ecc7e?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">03</span><span class="arrow">↗</span></div><div class="title">라우팅 설정</div><div class="desc">정적/동적 라우팅, AD·Metric 개념, RIP·EIGRP 설정</div></a>
+      <a class="card" href="pages/network/routing.html"><div class="top-row"><span class="tag">03</span><span class="arrow">↗</span></div><div class="title">라우팅 설정</div><div class="desc">정적/동적 라우팅, AD·Metric 개념, RIP·EIGRP 설정</div></a>
       <div class="flow-connector"><span class="arrow">↓</span><span>매번 수동 설정은 비효율적 — 자동화가 필요하다</span></div>
 
-      <a class="card" href="https://app.notion.com/p/DHCP-OSRF-651e4b21e2d08294be13019abd9f6975?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">04</span><span class="arrow">↗</span></div><div class="title">DHCP, OSPF</div><div class="desc">IP 자동 할당과 최단 경로 기반 동적 라우팅 프로토콜</div></a>
+      <a class="card" href="pages/network/dhcp-ospf.html"><div class="top-row"><span class="tag">04</span><span class="arrow">↗</span></div><div class="title">DHCP, OSPF</div><div class="desc">IP 자동 할당과 최단 경로 기반 동적 라우팅 프로토콜</div></a>
       <div class="flow-connector"><span class="arrow">↓</span><span>이제 트래픽을 통제하고 걸러낼 차례</span></div>
 
-      <a class="card" href="https://app.notion.com/p/ASL-NAT-329e4b21e2d082e4b50d811ba477275f?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">05</span><span class="arrow">↗</span></div><div class="title">ACL, NAT</div><div class="desc">접근 제어 목록으로 트래픽 필터링, 사설·공인 IP 주소 변환</div></a>
+      <a class="card" href="pages/network/acl-nat.html"><div class="top-row"><span class="tag">05</span><span class="arrow">↗</span></div><div class="title">ACL, NAT</div><div class="desc">접근 제어 목록으로 트래픽 필터링, 사설·공인 IP 주소 변환</div></a>
       <div class="flow-connector"><span class="arrow">↓</span><span>마지막으로, 이 모든 통신을 암호화해서 보호한다</span></div>
 
-      <a class="card" href="https://app.notion.com/p/VPN-af6e4b21e2d08325bbb48100a7b447cc?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">06</span><span class="arrow">↗</span></div><div class="title">VPN, 터널링, IPSec</div><div class="desc">GRE 터널링과 IPSec/ISAKMP 기반 site-to-site VPN 구성</div></a>
+      <a class="card" href="pages/network/vpn.html"><div class="top-row"><span class="tag">06</span><span class="arrow">↗</span></div><div class="title">VPN, 터널링, IPSec</div><div class="desc">GRE 터널링과 IPSec/ISAKMP 기반 site-to-site VPN 구성</div></a>
     </div>
   </div>
 
   <div class="subsection" id="linux">
     <div class="sub-head"><span class="emoji">🐧</span><h2>리눅스 서버 운영</h2><span class="count">4건</span></div>
     <div class="grid">
-      <a class="card" href="https://app.notion.com/p/SQL-ceee4b21e2d08308a689017c8a56c223?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">linux</span><span class="arrow">↗</span></div><div class="title">리눅스 기본 명령어, SQL</div><div class="desc">패키지 관리, 파일·권한 명령어와 SQL DDL/DML 기본 문법</div></a>
-      <a class="card" href="https://app.notion.com/p/0e1e4b21e2d08390974201d30ee114f3?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">linux</span><span class="arrow">↗</span></div><div class="title">리눅스 계정 관리</div><div class="desc">계정 정보 구조, 권한(umask), 파일 검색·삭제, 히스토리 확인</div></a>
-      <a class="card" href="https://app.notion.com/p/754e4b21e2d082c6b493016ff96dc5e5?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">linux</span><span class="arrow">↗</span></div><div class="title">자원 공유</div><div class="desc">NFS로 네트워크 폴더 공유, Samba로 윈도우와 파일 공유</div></a>
-      <a class="card" href="https://app.notion.com/p/LOG-4dfe4b21e2d0823e939a01980f7bca53?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">linux</span><span class="arrow">↗</span></div><div class="title">LOG</div><div class="desc">rsyslog 서버·DB 연동, LogAnalyzer 웹 시각화, grep 활용</div></a>
+      <a class="card" href="pages/network/linux-basic.html"><div class="top-row"><span class="tag">linux</span><span class="arrow">↗</span></div><div class="title">리눅스 기본 명령어, SQL</div><div class="desc">패키지 관리, 파일·권한 명령어와 SQL DDL/DML 기본 문법</div></a>
+      <a class="card" href="pages/network/linux-account.html"><div class="top-row"><span class="tag">linux</span><span class="arrow">↗</span></div><div class="title">리눅스 계정 관리</div><div class="desc">계정 정보 구조, 권한(umask), 파일 검색·삭제, 히스토리 확인</div></a>
+      <a class="card" href="pages/network/resource-share.html"><div class="top-row"><span class="tag">linux</span><span class="arrow">↗</span></div><div class="title">자원 공유</div><div class="desc">NFS로 네트워크 폴더 공유, Samba로 윈도우와 파일 공유</div></a>
+      <a class="card" href="pages/network/log.html"><div class="top-row"><span class="tag">linux</span><span class="arrow">↗</span></div><div class="title">LOG</div><div class="desc">rsyslog 서버·DB 연동, LogAnalyzer 웹 시각화, grep 활용</div></a>
     </div>
   </div>
 
   <div class="subsection" id="service">
     <div class="sub-head"><span class="emoji">🌐</span><h2>서비스 구축</h2><span class="count">2건</span></div>
     <div class="grid">
-      <a class="card" href="https://app.notion.com/p/HTTPS-FTP-DNS-8aae4b21e2d083ae820e8140ab9a3f26?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">service</span><span class="arrow">↗</span></div><div class="title">HTTP, HTTPS, FTP, DNS</div><div class="desc">아파치·SSL 인증서·vsftpd·BIND로 4가지 핵심 서버 구축</div></a>
-      <a class="card" href="https://app.notion.com/p/2022-86de4b21e2d0834bb86001c30e65d862?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">service</span><span class="arrow">↗</span></div><div class="title">윈도우 서버 2022, 패스워드 정책</div><div class="desc">IIS로 FTP·DNS 구축, 리눅스 비밀번호 복잡도 정책 설정</div></a>
+      <a class="card" href="pages/network/web-services.html"><div class="top-row"><span class="tag">service</span><span class="arrow">↗</span></div><div class="title">HTTP, HTTPS, FTP, DNS</div><div class="desc">아파치·SSL 인증서·vsftpd·BIND로 4가지 핵심 서버 구축</div></a>
+      <a class="card" href="pages/network/windows-server.html"><div class="top-row"><span class="tag">service</span><span class="arrow">↗</span></div><div class="title">윈도우 서버 2022, 패스워드 정책</div><div class="desc">IIS로 FTP·DNS 구축, 리눅스 비밀번호 복잡도 정책 설정</div></a>
     </div>
   </div>
 
   <div class="subsection" id="cloud">
     <div class="sub-head"><span class="emoji">☁️</span><h2>클라우드 / DB</h2><span class="count">1건</span></div>
     <div class="grid">
-      <a class="card" href="https://app.notion.com/p/DB-715e4b21e2d083188ed68146ac70a36d?pvs=21" target="_blank" rel="noopener"><div class="top-row"><span class="tag">cloud</span><span class="arrow">↗</span></div><div class="title">클라우드, 커널 설정, DB 복제</div><div class="desc">IaaS/PaaS/SaaS 개념, 커널 파라미터 설정, MariaDB Master-Slave 복제</div></a>
+      <a class="card" href="pages/network/cloud-db.html"><div class="top-row"><span class="tag">cloud</span><span class="arrow">↗</span></div><div class="title">클라우드, 커널 설정, DB 복제</div><div class="desc">IaaS/PaaS/SaaS 개념, 커널 파라미터 설정, MariaDB Master-Slave 복제</div></a>
     </div>
   </div>
 
