@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WarGame — 조경익</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff; --bg-alt:#f5f6f8; --panel:#f7f8fa; --panel-border:#e2e5ea;
+    --text:#1a1f24; --text-dim:#4b5560; --text-faint:#7c8894; --accent:#0f9d8f; --line:#e5e8ec;
+    --c-wargame:#dc2626;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:radial-gradient(ellipse at top left, rgba(94,234,212,0.06), transparent 45%), var(--bg);
+    color:var(--text); font-family:'Noto Sans KR', sans-serif; line-height:1.7; -webkit-font-smoothing:antialiased;}
+  .mono{font-family:'JetBrains Mono', monospace;}
+  a{color:inherit; text-decoration:none;}
+  .wrap{max-width:760px; margin:0 auto; padding:0 24px;}
+  .topbar{border-bottom:1px solid var(--line); background:rgba(255,255,255,0.9); backdrop-filter:blur(6px);}
+  .topbar-inner{display:flex; align-items:center; gap:16px; padding:14px 24px; max-width:760px; margin:0 auto;
+    font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--text-dim);}
+  .topbar-inner a:hover{color:var(--accent);}
+  .sep{color:var(--text-faint);}
+  .hero{padding:44px 0 28px; border-bottom:1px solid var(--line); margin-bottom:32px;}
+  .eyebrow{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--c-wargame); letter-spacing:.08em; margin-bottom:14px;}
+  .hero h1{font-size:clamp(24px,4vw,32px); font-weight:900; margin-bottom:10px;}
+  .hero p{color:var(--text-dim); font-size:14px;}
+  .content{padding-bottom:70px;}
+  .content h2{font-size:19px; font-weight:700; margin:38px 0 14px; padding-bottom:8px; border-bottom:1px solid var(--line);}
+  .content p{font-size:14px; color:var(--text-dim); margin-bottom:10px;}
+  .level{margin-bottom:22px; padding:16px 18px; background:var(--panel); border:1px solid var(--panel-border); border-left:3px solid var(--c-wargame); border-radius:8px;}
+  .level h4{font-size:13.5px; font-weight:700; margin-bottom:8px; font-family:'JetBrains Mono',monospace;}
+  .level p{margin-bottom:6px; font-size:13.5px; color:var(--text-dim);}
+  code.mono{background:#fff; padding:1px 5px; border-radius:4px; font-size:12.5px; border:1px solid var(--panel-border);}
+  footer{border-top:1px solid var(--line); padding:24px 0 50px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-faint);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="../../index.html">메인</a><span class="sep">/</span>
+    <a href="../../web.html">웹 해킹 / 워게임</a><span class="sep">/</span>
+    <span>WarGame</span>
+  </div>
+</div>
+
+<div class="wrap">
+  <section class="hero">
+    <div class="eyebrow mono">🎯 워게임 & VM 풀이</div>
+    <h1>WarGame — suninatas</h1>
+    <p>웹 해킹·시스템 해킹·리버싱·포렌식·암호학 등 다양한 카테고리를 제공하는 국내 CTF 스타일 워게임 플랫폼 풀이 기록</p>
+  </section>
+
+  <div class="content">
+
+    <h2>Challenges</h2>
+
+    <div class="level">
+      <h4>1</h4>
+      <p><code class="mono">Replace()</code>(치환), <code class="mono">MID(문자열, 시작위치, 길이)</code> 함수 코드 분석 → 코드 로직에 맞는 값을 입력해 key 획득.</p>
+    </div>
+
+    <div class="level">
+      <h4>2</h4>
+      <p>로그인 폼에서 id/pw가 같아야 한다는 힌트가 있지만, 자바스크립트가 id=pw일 때 값을 공백 처리하는 함정이 걸려있음 → 개발자 도구 콘솔에서 <code class="mono">document.web02.submit();</code>을 직접 호출해 강제 제출로 우회.</p>
+    </div>
+
+    <div class="level">
+      <h4>3</h4>
+      <p>notice 게시판은 글쓰기 기능이 없고 free 게시판에만 가능한 구조. URL 경로를 <code class="mono">/board/free/write</code>에서 <code class="mono">/board/notice/write</code>로 직접 조작해 원래 막혀있던 게시판에 글쓰기 성공.</p>
+    </div>
+
+    <div class="level">
+      <h4>4</h4>
+      <p>Point 값을 26까지 올리면 팝업이 뜨는 구조, 소스코드에서 User-Agent 관련 힌트 발견 → 프록시로 User-Agent와 point 값을 함께 조작해 해결.</p>
+    </div>
+
+    <div class="level">
+      <h4>5</h4>
+      <p>스크립트가 값을 공백 처리하는 난독화된 코드 확인(<code class="mono">eval()</code> 사용). jsnice.org에서 난독화 해제 후 로직을 분석해 해결.</p>
+    </div>
+
+    <div class="level">
+      <h4>6</h4>
+      <p>SQL 쿼리문 확인 결과 <code class="mono">=</code>이 공백 처리되는 필터가 있는 것으로 추정 → <code class="mono">LIKE</code> 구문으로 대체해 필터 우회.</p>
+    </div>
+
+  </div>
+
+  <footer>© 2026 조경익 · security learning log</footer>
+</div>
+</body>
+</html>
