@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ACL, NAT — 조경익</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff; --bg-alt:#f5f6f8; --panel:#f7f8fa; --panel-border:#e2e5ea;
+    --text:#1a1f24; --text-dim:#4b5560; --text-faint:#7c8894; --accent:#0f9d8f; --line:#e5e8ec;
+    --c-device:#2563eb;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:radial-gradient(ellipse at top left, rgba(94,234,212,0.06), transparent 45%), var(--bg);
+    color:var(--text); font-family:'Noto Sans KR', sans-serif; line-height:1.7; -webkit-font-smoothing:antialiased;}
+  .mono{font-family:'JetBrains Mono', monospace;}
+  a{color:inherit; text-decoration:none;}
+  .wrap{max-width:760px; margin:0 auto; padding:0 24px;}
+  .topbar{border-bottom:1px solid var(--line); background:rgba(255,255,255,0.9); backdrop-filter:blur(6px);}
+  .topbar-inner{display:flex; align-items:center; gap:16px; padding:14px 24px; max-width:760px; margin:0 auto;
+    font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--text-dim);}
+  .topbar-inner a:hover{color:var(--accent);}
+  .sep{color:var(--text-faint);}
+  .hero{padding:44px 0 28px; border-bottom:1px solid var(--line); margin-bottom:32px;}
+  .eyebrow{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--c-device); letter-spacing:.08em; margin-bottom:14px;}
+  .hero h1{font-size:clamp(24px,4vw,32px); font-weight:900; margin-bottom:10px;}
+  .hero p{color:var(--text-dim); font-size:14px;}
+  .content{padding-bottom:70px;}
+  .content h2{font-size:19px; font-weight:700; margin:38px 0 14px; padding-bottom:8px; border-bottom:1px solid var(--line);}
+  .content h3{font-size:15px; font-weight:700; margin:22px 0 8px; color:var(--c-device);}
+  .content p{font-size:14px; color:var(--text-dim); margin-bottom:10px;}
+  .content ul{margin:0 0 14px 20px; font-size:14px; color:var(--text-dim);}
+  .content li{margin-bottom:4px;}
+  .content li b{color:var(--text);}
+  table{width:100%; border-collapse:collapse; margin:14px 0 20px; font-size:13px;}
+  th, td{border:1px solid var(--panel-border); padding:8px 12px; text-align:left;}
+  th{background:var(--panel); color:var(--text); font-family:'JetBrains Mono',monospace; font-size:12px;}
+  td{color:var(--text-dim);}
+  pre{background:var(--panel); border:1px solid var(--panel-border); border-radius:8px; padding:14px 16px;
+    overflow-x:auto; margin:12px 0; font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--accent); line-height:1.6;}
+  code.mono{background:var(--panel); padding:1px 5px; border-radius:4px; font-size:12.5px;}
+  footer{border-top:1px solid var(--line); padding:24px 0 50px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-faint);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="../../index.html">메인</a><span class="sep">/</span>
+    <a href="../../network.html">서버·네트워크 기초</a><span class="sep">/</span>
+    <span>ACL, NAT</span>
+  </div>
+</div>
+
+<div class="wrap">
+  <section class="hero">
+    <div class="eyebrow mono">05 · 네트워크 장비 설정</div>
+    <h1>ACL, NAT</h1>
+    <p>접근 제어 목록으로 트래픽을 필터링하고, 사설·공인 IP 주소를 변환하는 설정 정리</p>
+  </section>
+
+  <div class="content">
+
+    <h2>1. ACL (Access Control List)</h2>
+    <h3>정의 및 동작 방식</h3>
+    <ul>
+      <li>특정 트래픽을 허용(permit)하거나 차단(deny)하는 필터</li>
+      <li>위에서 아래로 조건을 하나씩 검사</li>
+      <li><code class="mono">deny any</code>가 생략되어 있어서 지정하지 않은 패킷은 자동 차단</li>
+      <li>주로 L3 장비(라우터, L3 스위치)에 설정</li>
+    </ul>
+    <h3>Inbound / Outbound</h3>
+    <ul>
+      <li><b>Inbound</b> — 패킷이 들어오면 ACL을 먼저 검사한 뒤, 허용된 패킷만 라우팅 테이블을 참고해 목적지로 전달</li>
+      <li><b>Outbound</b> — 라우팅 테이블로 출구 인터페이스가 결정된 이후, 나가기 전에 ACL 정책 검사</li>
+    </ul>
+
+    <h3>종류</h3>
+    <table>
+      <tr><th>기능</th><th>방식</th><th>예시</th></tr>
+      <tr><td>Standard</td><td>Numbered</td><td>access-list 10</td></tr>
+      <tr><td>Standard</td><td>Named</td><td>ip access-list standard</td></tr>
+      <tr><td>Extended</td><td>Numbered</td><td>access-list 100</td></tr>
+      <tr><td>Extended</td><td>Named</td><td>ip access-list extended</td></tr>
+    </table>
+    <p>표준(Standard, 1~99)은 출발지 IP만 확인. 확장(Extended, 100~199)은 출발지+목적지+프로토콜+포트까지 확인. 번호 기반은 수정이 거의 불가능해 전체 삭제 후 재작성해야 하고, 이름 기반은 전용 모드로 들어가 수정 가능.</p>
+
+    <h3>Standard & Numbered 설정</h3>
+    <pre>access-list 10 permit host 192.168.0.10
+access-list 10 permit any
+
+interface fa0/0
+ip access-group 10 out</pre>
+    <p><code class="mono">access-list</code>로 누굴 허용/차단할지 정하고, <code class="mono">ip access-group</code>으로 어디에 적용할지 정함. 목적지와 가장 가까운 인터페이스에 적용하는 게 불필요한 점검을 줄여 효율적이며, 주로 outbound 사용.</p>
+
+    <h3>Extended & Numbered 설정</h3>
+    <pre>access-list 100 permit tcp 192.168.0.10 0.0.0.0 192.168.1.100 0.0.0.0 eq 80
+access-list 100 permit ip any any</pre>
+    <table>
+      <tr><th>명령어</th><th>의미</th><th>예시</th></tr>
+      <tr><td>eq</td><td>같다</td><td>eq 80</td></tr>
+      <tr><td>gt</td><td>초과</td><td>gt 1023</td></tr>
+      <tr><td>lt</td><td>미만</td><td>lt 1024</td></tr>
+      <tr><td>neq</td><td>같지 않음</td><td>neq 23</td></tr>
+      <tr><td>range</td><td>범위</td><td>range 20 30</td></tr>
+    </table>
+
+    <h3>확인 및 삭제</h3>
+    <pre>show access-lists
+
+no access-list 10                          // Standard Numbered 삭제
+no access-list 100                         // Extended Numbered 삭제
+no ip access-list standard [이름]           // Standard Named 삭제
+no ip access-list extended [이름]           // Extended Named 삭제</pre>
+
+    <h2>2. NAT (Network Address Translation)</h2>
+    <ul>
+      <li>내부 사설 IP를 공인 IP로 변환</li>
+      <li>static / dynamic 방식 존재, 기본은 1:1 매핑</li>
+      <li>/24 vs /24는 매핑 가능하지만, /26 vs /24는 1:1 매핑 불가능</li>
+    </ul>
+
+    <h3>종류</h3>
+    <ul>
+      <li><b>Dynamic NAT</b> — ACL 설정 필요, 공인 IP Pool 사용, 동적 1:1 매핑</li>
+      <li><b>Static NAT</b> — 특정 IP를 고정 매핑</li>
+      <li><b>PAT (Port Address Translation)</b> — n:m 구조, 하나의 공인 IP를 여러 내부 IP가 포트로 구분해 공유</li>
+    </ul>
+
+    <h3>Dynamic NAT 설정</h3>
+    <pre>// 1. ACL 설정
+access-list 10 permit 192.168.1.0 0.0.0.255
+
+// 2. NAT Pool 생성
+ip nat pool nattest 5.5.5.1 20.20.20.254 netmask 255.255.255.0
+
+// 3. ACL + Pool 연결
+ip nat inside source list 10 pool nattest
+
+// 4. 인터페이스 설정
+ip nat inside   (/fa)
+ip nat outside  (/se)</pre>
+    <p>누굴 바꿀지(access-list) → 뭘로 바꿀지(ip nat pool) → 둘을 연결(ip nat inside source) → 내부/외부 인터페이스 지정(ip nat inside/outside) 순서.</p>
+
+    <h3>Static NAT 설정</h3>
+    <pre>ip nat inside source static 192.168.1.100 20.20.20.1</pre>
+    <p>내부(사설) IP 192.168.1.100을 외부(공인) IP 20.20.20.1로 1:1 고정 매핑.</p>
+
+  </div>
+
+  <footer>© 2026 조경익 · security learning log</footer>
+</div>
+</body>
+</html>
