@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>라우팅 설정 — 조경익</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff; --bg-alt:#f5f6f8; --panel:#f7f8fa; --panel-border:#e2e5ea;
+    --text:#1a1f24; --text-dim:#4b5560; --text-faint:#7c8894; --accent:#0f9d8f; --line:#e5e8ec;
+    --c-device:#2563eb;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:radial-gradient(ellipse at top left, rgba(94,234,212,0.06), transparent 45%), var(--bg);
+    color:var(--text); font-family:'Noto Sans KR', sans-serif; line-height:1.7; -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:'JetBrains Mono', monospace;}
+  a{color:inherit; text-decoration:none;}
+  .wrap{max-width:760px; margin:0 auto; padding:0 24px;}
+
+  .topbar{border-bottom:1px solid var(--line); background:rgba(255,255,255,0.9); backdrop-filter:blur(6px);}
+  .topbar-inner{display:flex; align-items:center; gap:16px; padding:14px 24px; max-width:760px; margin:0 auto;
+    font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--text-dim);}
+  .topbar-inner a:hover{color:var(--accent);}
+  .sep{color:var(--text-faint);}
+
+  .hero{padding:44px 0 28px; border-bottom:1px solid var(--line); margin-bottom:32px;}
+  .eyebrow{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--c-device); letter-spacing:.08em; margin-bottom:14px;}
+  .hero h1{font-size:clamp(24px,4vw,32px); font-weight:900; margin-bottom:10px;}
+  .hero p{color:var(--text-dim); font-size:14px;}
+
+  .content{padding-bottom:70px;}
+  .content h2{font-size:19px; font-weight:700; margin:38px 0 14px; padding-bottom:8px; border-bottom:1px solid var(--line);}
+  .content h3{font-size:15px; font-weight:700; margin:22px 0 8px; color:var(--c-device);}
+  .content p{font-size:14px; color:var(--text-dim); margin-bottom:10px;}
+  .content ul{margin:0 0 14px 20px; font-size:14px; color:var(--text-dim);}
+  .content li{margin-bottom:4px;}
+  .content li b{color:var(--text);}
+
+  table{width:100%; border-collapse:collapse; margin:14px 0 20px; font-size:13px;}
+  th, td{border:1px solid var(--panel-border); padding:8px 12px; text-align:left;}
+  th{background:var(--panel); color:var(--text); font-family:'JetBrains Mono',monospace; font-size:12px;}
+  td{color:var(--text-dim);}
+
+  pre{background:var(--panel); border:1px solid var(--panel-border); border-radius:8px; padding:14px 16px;
+    overflow-x:auto; margin:12px 0; font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--accent); line-height:1.6;}
+  code.mono{background:var(--panel); padding:1px 5px; border-radius:4px; font-size:12.5px;}
+
+  .img-placeholder{
+    display:flex; align-items:center; gap:8px; background:var(--panel); border:1px dashed var(--panel-border);
+    border-radius:8px; padding:12px 14px; margin:10px 0; font-size:12px; color:var(--text-faint); font-family:'JetBrains Mono',monospace;
+  }
+
+  footer{border-top:1px solid var(--line); padding:24px 0 50px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-faint);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="../../index.html">메인</a><span class="sep">/</span>
+    <a href="../../network.html">서버·네트워크 기초</a><span class="sep">/</span>
+    <span>라우팅 설정</span>
+  </div>
+</div>
+
+<div class="wrap">
+
+  <section class="hero">
+    <div class="eyebrow mono">03 · 네트워크 장비 설정</div>
+    <h1>라우팅 설정</h1>
+    <p>정적/동적 라우팅 개념, AD·Metric 비교, RIP·EIGRP 프로토콜 설정 정리</p>
+  </section>
+
+  <div class="content">
+
+    <h2>1. 라우팅 프로토콜 기본 개념</h2>
+    <p>서로 다른 네트워크로 데이터를 보내기 위해 최적의 경로를 찾고 전달하는 것.</p>
+    <h3>Static Routing (정적 라우팅)</h3>
+    <ul>
+      <li>관리자가 직접 경로를 설정</li>
+      <li>단순하지만 규모가 커지면 관리 어려움</li>
+    </ul>
+    <h3>Dynamic Routing (동적 라우팅)</h3>
+    <ul>
+      <li>라우터끼리 자동으로 경로를 학습</li>
+      <li>대표 프로토콜: RIP, EIGRP, OSPF, BGP</li>
+    </ul>
+
+    <h2>2. 정적 라우팅 설정</h2>
+    <pre>ip route [목적지 네트워크] [서브넷 마스크] [다음 홉 IP]</pre>
+    <p>예: 192.168.200.0 네트워크로 가려면 10.0.0.2 라우터를 거치라는 뜻. 양쪽 라우터에 모두 설정해야 통신 가능.</p>
+    <h3>설정 확인 / 삭제</h3>
+    <pre>show running-config
+show ip route      // S(static)는 정적 라우팅 설정을 의미
+
+no ip route [목적지 네트워크] [서브넷 마스크] [다음 홉 IP]</pre>
+
+    <h2>3. AD / Metric</h2>
+    <p><code class="mono">show ip route</code> 출력의 대괄호 안 숫자 중 왼쪽은 <b>AD(신뢰도)</b>, 오른쪽은 <b>Metric(비용)</b>. 서로 다른 라우팅 프로토콜끼리 경쟁할 때는 AD가 더 낮은 쪽이 살아남고, 같은 프로토콜 안에서는 Metric을 비교해 가장 좋은 경로를 선택.</p>
+    <div class="img-placeholder">🖼 스크린샷 자리 — AD 값 설정 및 tracert 결과</div>
+    <ul>
+      <li>라우팅 추가 명령어 뒤에 AD 값만 붙이면 설정 가능</li>
+      <li>AD 값이 같으면 라우팅 테이블에 같이 올라감(부하 분산)</li>
+      <li>더 낮은 AD 값의 정보만 라우팅 테이블에 반영되고, 나머지는 <code class="mono">show running-config</code>로만 확인 가능</li>
+      <li><code class="mono">tracert [주소]</code>로 실제 경로 확인 — AD 값을 바꾸면 선택되는 경로도 바뀌는 것을 실습으로 확인</li>
+    </ul>
+
+    <h2>4. 동적 라우팅 (RIP) 설정</h2>
+    <ul>
+      <li>홉 수가 최적 경로(메트릭 값)를 결정하는 프로토콜 — 홉이 적어도 저속 회선이면 비효율적일 수 있음</li>
+      <li>15홉 제한, 16부터는 unknown 처리</li>
+      <li>30초마다 hello packet을 주고받아 업데이트</li>
+    </ul>
+    <pre>router rip
+network 192.168.10.0
+network 10.0.0.0
+version 2
+no auto-summary</pre>
+    <p><code class="mono">router rip</code>로 프로토콜 모드 진입, <code class="mono">network</code>로 참여시킬 네트워크 등록. RIP는 서브넷/와일드 마스크가 필요 없고, 라우팅 이웃은 양방향 동의로 형성됨. 기본값은 버전 1이지만 서브넷 정보를 못 넘겨서(classful) <code class="mono">version 2</code>로 설정. <code class="mono">no auto-summary</code>까지 해줘야 클래스 단위 자동 축약이 일어나지 않고 서브넷 그대로 광고됨.</p>
+    <pre>no router rip   // RIP 전체 설정 삭제</pre>
+
+    <h2>5. 동적 라우팅 (EIGRP) 설정</h2>
+    <p>대역폭과 지연시간을 기준으로 최적 경로를 선택하는 Cisco 전용 프로토콜로, RIP보다 훨씬 효율적.</p>
+    <pre>router eigrp [AS 번호]
+network [네트워크 주소] [Wildcard Mask]
+no auto-summary</pre>
+    <p>AS 번호는 독립된 네트워크 묶음의 이름표. Wildcard Mask는 서브넷 마스크를 반전시킨 것으로 EIGRP는 이걸 사용. 패킷 트레이서 최신 버전의 EIGRP는 이미 no auto-summary 상태라 입력해도 반응 없을 수 있음.</p>
+    <pre>no router eigrp [as 번호]   // 삭제</pre>
+
+    <h3>재분배 (Redistribute)</h3>
+    <pre>router eigrp 20
+redistribute eigrp 10
+
+router eigrp 10
+redistribute eigrp 20</pre>
+    <p>서로 다른 라우팅 프로토콜(예: eigrp 10 ↔ eigrp 20)끼리 경로를 공유해서 통신. 하나의 경계 라우터에 위 명령어를 다 입력하고 network도 추가해야 함. 양방향 재분배가 원칙. D EX = 재분배로 들어온 외부 경로 (신뢰도 낮음, AD 170).</p>
+
+  </div>
+
+  <footer>© 2026 조경익 · security learning log</footer>
+</div>
+</body>
+</html>
