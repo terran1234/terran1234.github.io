@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LOG — 조경익</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff; --bg-alt:#f5f6f8; --panel:#f7f8fa; --panel-border:#e2e5ea;
+    --text:#1a1f24; --text-dim:#4b5560; --text-faint:#7c8894; --accent:#0f9d8f; --line:#e5e8ec;
+    --c-linux:#0f9d5a;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:radial-gradient(ellipse at top left, rgba(94,234,212,0.06), transparent 45%), var(--bg);
+    color:var(--text); font-family:'Noto Sans KR', sans-serif; line-height:1.7; -webkit-font-smoothing:antialiased;}
+  .mono{font-family:'JetBrains Mono', monospace;}
+  a{color:inherit; text-decoration:none;}
+  .wrap{max-width:760px; margin:0 auto; padding:0 24px;}
+  .topbar{border-bottom:1px solid var(--line); background:rgba(255,255,255,0.9); backdrop-filter:blur(6px);}
+  .topbar-inner{display:flex; align-items:center; gap:16px; padding:14px 24px; max-width:760px; margin:0 auto;
+    font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--text-dim);}
+  .topbar-inner a:hover{color:var(--accent);}
+  .sep{color:var(--text-faint);}
+  .hero{padding:44px 0 28px; border-bottom:1px solid var(--line); margin-bottom:32px;}
+  .eyebrow{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--c-linux); letter-spacing:.08em; margin-bottom:14px;}
+  .hero h1{font-size:clamp(24px,4vw,32px); font-weight:900; margin-bottom:10px;}
+  .hero p{color:var(--text-dim); font-size:14px;}
+  .content{padding-bottom:70px;}
+  .content h2{font-size:19px; font-weight:700; margin:38px 0 14px; padding-bottom:8px; border-bottom:1px solid var(--line);}
+  .content h3{font-size:15px; font-weight:700; margin:22px 0 8px; color:var(--c-linux);}
+  .content p{font-size:14px; color:var(--text-dim); margin-bottom:10px;}
+  .content ul{margin:0 0 14px 20px; font-size:14px; color:var(--text-dim);}
+  .content li{margin-bottom:4px;}
+  .content li b{color:var(--text);}
+  table{width:100%; border-collapse:collapse; margin:14px 0 20px; font-size:13px;}
+  th, td{border:1px solid var(--panel-border); padding:8px 12px; text-align:left;}
+  th{background:var(--panel); color:var(--text); font-family:'JetBrains Mono',monospace; font-size:12px;}
+  td{color:var(--text-dim);}
+  pre{background:var(--panel); border:1px solid var(--panel-border); border-radius:8px; padding:14px 16px;
+    overflow-x:auto; margin:12px 0; font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--accent); line-height:1.6;}
+  code.mono{background:var(--panel); padding:1px 5px; border-radius:4px; font-size:12.5px;}
+  footer{border-top:1px solid var(--line); padding:24px 0 50px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-faint);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="../../index.html">메인</a><span class="sep">/</span>
+    <a href="../../network.html">서버·네트워크 기초</a><span class="sep">/</span>
+    <span>LOG</span>
+  </div>
+</div>
+
+<div class="wrap">
+  <section class="hero">
+    <div class="eyebrow mono">10 · 리눅스 서버 운영</div>
+    <h1>LOG</h1>
+    <p>로그 기본 개념, rsyslog 서버·DB 연동, LogAnalyzer 웹 시각화, grep 활용 정리</p>
+  </section>
+
+  <div class="content">
+
+    <h2>1. 로그 기본 개념</h2>
+    <ul>
+      <li>시스템에서 일어난 일을 기록해 놓은 파일, 기본 위치 <code class="mono">/var/log/</code></li>
+      <li><code class="mono">logrotate</code> — 로그를 주기적으로 교체/정리하는 기능, 설정 파일은 <code class="mono">/etc/logrotate.d</code></li>
+      <li>로그 서버 = 관리 편의 + 증거 보존 목적</li>
+    </ul>
+
+    <h3>Facility (발생 위치)</h3>
+    <table>
+      <tr><th>Facility</th><th>설명</th></tr>
+      <tr><td>auth</td><td>로그인, 인증 관련</td></tr>
+      <tr><td>authpriv</td><td>인증 중 민감 정보</td></tr>
+      <tr><td>cron</td><td>예약 작업 실행 로그</td></tr>
+      <tr><td>daemon</td><td>백그라운드 서비스 로그</td></tr>
+      <tr><td>kern</td><td>커널 로그</td></tr>
+      <tr><td>mail</td><td>이메일 관련 로그</td></tr>
+      <tr><td>user</td><td>일반 프로그램 로그</td></tr>
+      <tr><td>local0~7</td><td>직접 정의해서 쓰는 로그</td></tr>
+    </table>
+
+    <h3>Priority (긴급도)</h3>
+    <table>
+      <tr><th>Priority</th><th>설명</th></tr>
+      <tr><td>emerg</td><td>시스템 완전 멈춤 (최악)</td></tr>
+      <tr><td>alert</td><td>즉시 조치 필요</td></tr>
+      <tr><td>crit</td><td>매우 심각한 문제</td></tr>
+      <tr><td>err</td><td>일반적인 오류</td></tr>
+      <tr><td>warning</td><td>주의 필요</td></tr>
+      <tr><td>notice</td><td>중요한 변화 발생</td></tr>
+      <tr><td>info</td><td>정보성</td></tr>
+      <tr><td>debug</td><td>개발/문제 해결용</td></tr>
+    </table>
+
+    <h3>중요 로그 파일</h3>
+    <table>
+      <tr><th>로그</th><th>이유</th><th>확인 명령어</th></tr>
+      <tr><td>messages</td><td>시스템 전체 상황(기본 로그)</td><td>cat messages</td></tr>
+      <tr><td>lastlog</td><td>마지막 로그인 정보</td><td>lastlog</td></tr>
+      <tr><td>wtmp</td><td>누가 접속했는지</td><td>last</td></tr>
+      <tr><td>btmp</td><td>로그인 실패 기록</td><td>lastb</td></tr>
+    </table>
+    <p>lastlog, wtmp, btmp는 바이너리 형식이라 cat으로 열면 깨져서 출력됨.</p>
+
+    <h2>2. rsyslog 서버 구축</h2>
+    <p>클라이언트에서 발생한 로그를 서버로 전송하고, 서버에서 실시간으로 확인하는 과정.</p>
+    <pre>dnf install -y rsyslog rsyslog-doc   // 서버, 클라이언트 양쪽</pre>
+    <pre>vi /etc/rsyslog.conf
+$ModLoad imudp
+$InputUDPServerRun 514
+$ModLoad imtcp
+$InputTCPServerRun 514
+
+firewall-cmd --permanent --add-port=514/tcp
+firewall-cmd --permanent --add-port=514/udp
+firewall-cmd --reload</pre>
+    <pre>systemctl start rsyslog
+systemctl enable rsyslog</pre>
+    <pre>dnf install -y lsof net-tools
+lsof -i tcp:514
+lsof -i udp:514
+netstat -npl | grep 514</pre>
+    <pre>// 클라이언트에서 전송 대상 설정
+vi /etc/rsyslog.conf
+*.* @@[서버 IP]:514   // TCP
+*.* @[서버 IP]:514    // UDP
+
+systemctl restart rsyslog</pre>
+    <pre>// 확인
+tail -f /var/log/messages
+systemctl restart sshd   // 클라이언트에서 이벤트 발생시켜 서버 로그 갱신 확인</pre>
+
+    <h2>3. DB 연동</h2>
+    <pre>dnf install -y mariadb-server
+systemctl start mariadb
+systemctl enable mariadb
+
+dnf install -y rsyslog-mysql</pre>
+    <pre>mysql -u root -p < /usr/share/doc/rsyslog/mysql-createDB.sql
+
+grant all on Syslog.* to '[사용자명]'@'%' identified by 'password';
+flush privileges;</pre>
+    <pre>vi /etc/rsyslog.conf
+$ModLoad ommysql
+*.*:ommysql:127.0.0.1,Syslog,rsyslog,password
+
+systemctl restart rsyslog</pre>
+    <pre>firewall-cmd --permanent --add-port=3306/tcp
+firewall-cmd --reload</pre>
+    <pre>// 확인
+mysql -u root -p
+use Syslog;
+select * from SystemEvents;</pre>
+
+    <h2>4. LogAnalyzer (웹 시각화)</h2>
+    <pre>dnf install -y httpd php php-mysqli wget tar
+
+wget -P /tmp http://download.adiscon.com/loganalyzer/loganalyzer-4.1.13.tar.gz
+tar -xzvf /tmp/loganalyzer-4.1.13.tar.gz -C /tmp</pre>
+    <pre>mkdir /var/www/html/loganalyzer
+cp -r /tmp/loganalyzer-4.1.13/src/* /var/www/html/loganalyzer
+cp /tmp/loganalyzer-4.1.13/contrib/configure.sh /var/www/html/loganalyzer</pre>
+    <pre>bash configure.sh
+touch config.php
+chmod 666 config.php
+
+systemctl restart httpd</pre>
+    <p>웹으로 <code class="mono">http://[서버 IP]/loganalyzer/</code> 접속 후 단계별 설정 진행. SELinux 정책 때문에 다음 명령어들이 추가로 필요할 수 있음.</p>
+    <pre>chcon -h -t httpd_sys_script_rw_t config.php
+
+setsebool -P httpd_can_network_connect_db 1
+systemctl restart httpd</pre>
+    <p>Source Type을 MySQL Native로 설정하고 DB 정보 입력 후, 클라이언트에서 이벤트 발생시켜 웹페이지에 실시간 갱신되는지 확인.</p>
+
+    <h2>5. GREP</h2>
+    <p>파일이나 출력에서 원하는 문자열을 찾아주는 명령어.</p>
+    <pre>grep "찾을내용" 파일명
+grep "error" /var/log/messages</pre>
+
+  </div>
+
+  <footer>© 2026 조경익 · security learning log</footer>
+</div>
+</body>
+</html>
