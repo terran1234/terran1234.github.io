@@ -8,208 +8,95 @@
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
 <style>
   :root{
-    --bg: #0a0d10;
-    --bg-alt: #0f1318;
-    --panel: #12171d;
-    --panel-border: #212a33;
-    --text: #dde4ea;
-    --text-dim: #7c8894;
-    --text-faint: #4b5560;
-    --accent: #5eead4;
-    --line: #1c242c;
-
-    --c-malware: #f2726b;
-    --c-web: #5eead4;
-    --c-infra: #f2a94e;
-    --c-hospital: #c893f2;
-    --c-network: #6ea8f2;
-    --c-etc: #6b7580;
+    --bg:#0a0d10; --bg-alt:#0f1318; --panel:#12171d; --panel-border:#212a33;
+    --text:#dde4ea; --text-dim:#93a0ac; --text-faint:#5a6470; --accent:#5eead4; --line:#1c242c;
+    --c-network:#6ea8f2; --c-hospital:#c893f2; --c-infra:#f2a94e; --c-web:#5eead4; --c-malware:#f2726b;
   }
   *{box-sizing:border-box; margin:0; padding:0;}
-  html{scroll-behavior:smooth;}
   body{
-    background:
-      radial-gradient(ellipse at top left, rgba(94,234,212,0.06), transparent 45%),
-      radial-gradient(ellipse at 80% 0%, rgba(242,169,78,0.05), transparent 40%),
-      var(--bg);
-    color:var(--text);
-    font-family:'Noto Sans KR', sans-serif;
-    line-height:1.6;
-    -webkit-font-smoothing:antialiased;
+    background:radial-gradient(ellipse at top left, rgba(94,234,212,0.06), transparent 45%),
+      radial-gradient(ellipse at 80% 0%, rgba(242,169,78,0.05), transparent 40%), var(--bg);
+    color:var(--text); font-family:'Noto Sans KR', sans-serif; line-height:1.6; -webkit-font-smoothing:antialiased;
   }
   .mono{font-family:'JetBrains Mono', monospace;}
   a{color:inherit; text-decoration:none;}
-  .wrap{max-width:920px; margin:0 auto; padding:0 24px;}
+  .wrap{max-width:980px; margin:0 auto; padding:0 24px;}
 
-  .topbar{
-    border-bottom:1px solid var(--line);
-    background:rgba(10,13,16,0.85);
-    backdrop-filter:blur(6px);
-    position:sticky; top:0; z-index:50;
-  }
-  .topbar-inner{
-    display:flex; align-items:center; justify-content:space-between;
-    padding:14px 24px; max-width:920px; margin:0 auto;
-  }
-  .brand{font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim); display:flex; align-items:center; gap:8px;}
+  .topbar{border-bottom:1px solid var(--line); background:rgba(10,13,16,0.85); backdrop-filter:blur(6px);}
+  .topbar-inner{display:flex; align-items:center; gap:8px; padding:14px 24px; max-width:980px; margin:0 auto;
+    font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--text-dim);}
   .dot{width:7px; height:7px; border-radius:50%; background:var(--accent); box-shadow:0 0 8px var(--accent); animation:pulse 2.4s ease-in-out infinite;}
   @keyframes pulse{0%,100%{opacity:1;} 50%{opacity:.35;}}
-  .nav-links{display:flex; gap:18px; font-size:12px; font-family:'JetBrains Mono',monospace;}
-  .nav-links a{color:var(--text-faint); padding-bottom:2px; border-bottom:1px solid transparent;}
-  .nav-links a:hover{color:var(--text);}
-  .nav-links a.n-malware:hover{color:var(--c-malware); border-color:var(--c-malware);}
-  .nav-links a.n-web:hover{color:var(--c-web); border-color:var(--c-web);}
-  .nav-links a.n-infra:hover{color:var(--c-infra); border-color:var(--c-infra);}
-  .nav-links a.n-hospital:hover{color:var(--c-hospital); border-color:var(--c-hospital);}
-  .nav-links a.n-network:hover{color:var(--c-network); border-color:var(--c-network);}
 
-  .hero{padding:80px 0 52px;}
-  .hero-eyebrow{
-    font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--accent);
-    letter-spacing:.08em; display:flex; align-items:center; gap:10px; margin-bottom:22px;
-  }
+  .hero{padding:72px 0 40px;}
+  .hero-eyebrow{font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--accent); letter-spacing:.08em; display:flex; align-items:center; gap:10px; margin-bottom:22px;}
   .hero-eyebrow::before{content:''; width:22px; height:1px; background:var(--accent);}
-  .hero h1{
-    font-size:clamp(32px, 5.2vw, 52px); font-weight:900; letter-spacing:-0.02em;
-    line-height:1.2; margin-bottom:18px;
-  }
+  .hero h1{font-size:clamp(30px, 4.8vw, 48px); font-weight:900; letter-spacing:-0.02em; line-height:1.22; margin-bottom:16px;}
   .hero h1 .hl{color:var(--accent);}
-  .hero p{color:var(--text-dim); font-size:15.5px; max-width:580px; margin-bottom:32px;}
+  .hero p{color:var(--text-dim); font-size:15.5px; max-width:600px; margin-bottom:28px;}
 
-  .terminal{
-    background:var(--panel); border:1px solid var(--panel-border); border-radius:10px;
-    overflow:hidden; box-shadow:0 20px 60px -20px rgba(0,0,0,0.6);
-  }
-  .terminal-head{
-    display:flex; align-items:center; gap:8px; padding:11px 14px;
-    border-bottom:1px solid var(--panel-border); background:var(--bg-alt);
-  }
+  .terminal{background:var(--panel); border:1px solid var(--panel-border); border-radius:10px; overflow:hidden; box-shadow:0 20px 60px -20px rgba(0,0,0,0.6);}
+  .terminal-head{display:flex; align-items:center; gap:8px; padding:11px 14px; border-bottom:1px solid var(--panel-border); background:var(--bg-alt);}
   .terminal-head span{width:10px; height:10px; border-radius:50%; background:#333;}
   .terminal-head .lbl{margin-left:8px; font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--text-faint);}
   .terminal-body{padding:20px 22px; font-family:'JetBrains Mono',monospace; font-size:13.5px; color:var(--text-dim);}
-  .terminal-body .ln{margin-bottom:6px; white-space:pre-wrap;}
+  .terminal-body .ln{margin-bottom:6px;}
   .terminal-body .prompt{color:var(--accent);}
   .terminal-body .out{color:var(--text);}
   .caret{display:inline-block; width:7px; height:14px; background:var(--accent); vertical-align:middle; animation:blink 1s step-end infinite;}
   @keyframes blink{0%,50%{opacity:1;} 50.01%,100%{opacity:0;}}
 
-  .notice{
-    display:flex; gap:10px; align-items:flex-start;
-    background:rgba(242,169,78,0.06); border:1px solid rgba(242,169,78,0.22);
-    border-radius:8px; padding:12px 16px; margin:44px 0 8px;
-    font-size:12.5px; color:var(--text-dim);
+  .path{margin:44px 0 20px; display:flex; align-items:center; gap:10px; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-faint);}
+  .path::after{content:''; flex:1; height:1px; background:var(--line);}
+
+  .tiles{display:flex; flex-direction:column; gap:12px; margin-bottom:60px;}
+  .tile{
+    display:flex; align-items:center; gap:20px;
+    padding:22px 24px; border-radius:12px; background:var(--panel);
+    border:1px solid var(--panel-border); border-left-width:4px;
+    transition:transform .15s, background .15s;
   }
-  .notice b{color:var(--c-infra); font-family:'JetBrains Mono',monospace;}
+  .tile:hover{transform:translateX(4px); background:#151b22;}
+  .tile .step{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-faint); width:44px; flex-shrink:0;}
+  .tile .emoji{font-size:26px; flex-shrink:0;}
+  .tile .body{flex:1; min-width:0;}
+  .tile .title{font-size:17px; font-weight:700; margin-bottom:4px;}
+  .tile .why{font-size:13px; color:var(--text-dim);}
+  .tile .meta{display:flex; flex-direction:column; align-items:flex-end; gap:6px; flex-shrink:0;}
+  .tile .count{font-family:'JetBrains Mono',monospace; font-size:11px; padding:3px 10px; border-radius:20px; white-space:nowrap;}
+  .tile .arrow{font-size:15px; color:var(--text-faint); opacity:0; transition:opacity .15s, transform .15s;}
+  .tile:hover .arrow{opacity:1; transform:translateX(3px);}
 
-  .stats{
-    display:grid; grid-template-columns:repeat(3,1fr); gap:1px;
-    background:var(--line); border:1px solid var(--line); border-radius:10px; overflow:hidden;
-    margin:24px 0 60px;
-  }
-  .stat{background:var(--panel); padding:20px 18px;}
-  .stat .num{font-family:'JetBrains Mono',monospace; font-size:26px; font-weight:700; color:var(--accent);}
-  .stat .lbl{font-size:12px; color:var(--text-faint); margin-top:4px;}
+  .tile.network{border-left-color:var(--c-network);} .tile.network .count{color:var(--c-network); background:color-mix(in srgb, var(--c-network) 12%, transparent);}
+  .tile.hospital{border-left-color:var(--c-hospital);} .tile.hospital .count{color:var(--c-hospital); background:color-mix(in srgb, var(--c-hospital) 12%, transparent);}
+  .tile.infra{border-left-color:var(--c-infra);} .tile.infra .count{color:var(--c-infra); background:color-mix(in srgb, var(--c-infra) 12%, transparent);}
+  .tile.web{border-left-color:var(--c-web);} .tile.web .count{color:var(--c-web); background:color-mix(in srgb, var(--c-web) 12%, transparent);}
+  .tile.malware{border-left-color:var(--c-malware);} .tile.malware .count{color:var(--c-malware); background:color-mix(in srgb, var(--c-malware) 12%, transparent);}
 
-  .section{margin-bottom:52px;}
-  .section-head{margin-bottom:16px; padding-bottom:14px; border-bottom:1px solid var(--line);}
-  .section-head-top{display:flex; align-items:baseline; gap:12px;}
-  .section-head .idx{font-family:'JetBrains Mono',monospace; font-size:13px;}
-  .section-head h2{font-size:19px; font-weight:700;}
-  .section-head .count{
-    margin-left:auto; font-family:'JetBrains Mono',monospace; font-size:11px;
-    color:var(--text-faint); border:1px solid var(--panel-border); padding:2px 9px; border-radius:20px;
-  }
-  .section-head .why{
-    font-size:12.5px; color:var(--text-faint); margin-top:8px; padding-left:2px;
-    display:flex; gap:7px; align-items:flex-start;
-  }
-  .section-head .why .ico{flex-shrink:0; opacity:.7;}
-
-  .log-list{list-style:none; display:flex; flex-direction:column; gap:2px;}
-  .log-item{border-radius:8px; overflow:hidden;}
-  .log-link{
-    display:flex; align-items:center; gap:14px;
-    padding:11px 14px; border-radius:8px; border:1px solid transparent;
-    border-left:2px solid transparent; color:inherit; text-decoration:none;
-    transition:background .15s, border-color .15s, transform .15s;
-  }
-  .log-link:hover{background:var(--panel); border-color:var(--panel-border); transform:translateX(2px);}
-  .log-item .tag{
-    font-family:'JetBrains Mono',monospace; font-size:10.5px;
-    padding:2px 7px; border-radius:4px; white-space:nowrap; flex-shrink:0; width:64px; text-align:center;
-  }
-  .log-item .txt{font-size:14.5px; color:var(--text); flex:1;}
-  .log-item .arrow{font-size:13px; color:var(--text-faint); opacity:0; transition:opacity .15s, transform .15s;}
-  .log-link:hover .arrow{opacity:1; transform:translateX(2px);}
-  .log-link.disabled{cursor:default; padding-left:14px;}
-  .log-link.disabled .txt{color:var(--text-faint); font-style:italic;}
-  .log-link.disabled:hover{background:none; border-color:transparent; transform:none;}
-
-  #malware .log-link{border-left-color:color-mix(in srgb, var(--c-malware) 35%, transparent);}
-  #malware .tag{color:var(--c-malware); background:color-mix(in srgb, var(--c-malware) 12%, transparent); border:1px solid color-mix(in srgb, var(--c-malware) 30%, transparent);}
-  #malware .idx{color:var(--c-malware);}
-
-  #web .log-link{border-left-color:color-mix(in srgb, var(--c-web) 35%, transparent);}
-  #web .tag{color:var(--c-web); background:color-mix(in srgb, var(--c-web) 12%, transparent); border:1px solid color-mix(in srgb, var(--c-web) 30%, transparent);}
-  #web .idx{color:var(--c-web);}
-
-  #infra .log-link{border-left-color:color-mix(in srgb, var(--c-infra) 35%, transparent);}
-  #infra .tag{color:var(--c-infra); background:color-mix(in srgb, var(--c-infra) 12%, transparent); border:1px solid color-mix(in srgb, var(--c-infra) 30%, transparent);}
-  #infra .idx{color:var(--c-infra);}
-
-  #hospital .log-link{border-left-color:color-mix(in srgb, var(--c-hospital) 35%, transparent);}
-  #hospital .tag{color:var(--c-hospital); background:color-mix(in srgb, var(--c-hospital) 12%, transparent); border:1px solid color-mix(in srgb, var(--c-hospital) 30%, transparent);}
-  #hospital .idx{color:var(--c-hospital);}
-
-  #network .log-link{border-left-color:color-mix(in srgb, var(--c-network) 35%, transparent);}
-  #network .tag{color:var(--c-network); background:color-mix(in srgb, var(--c-network) 12%, transparent); border:1px solid color-mix(in srgb, var(--c-network) 30%, transparent);}
-  #network .idx{color:var(--c-network);}
-
-  #etc .log-link{border-left-color:color-mix(in srgb, var(--c-etc) 35%, transparent);}
-  #etc .tag{color:var(--c-etc); background:color-mix(in srgb, var(--c-etc) 12%, transparent); border:1px solid color-mix(in srgb, var(--c-etc) 30%, transparent);}
-  #etc .idx{color:var(--c-etc);}
-
-  footer{
-    border-top:1px solid var(--line); padding:30px 0 60px; margin-top:20px;
-    display:flex; justify-content:space-between; align-items:center;
-    font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-faint);
-  }
+  footer{border-top:1px solid var(--line); padding:30px 0 60px; display:flex; justify-content:space-between; align-items:center;
+    font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-faint);}
   footer a:hover{color:var(--accent);}
 
   @media (max-width:640px){
-    .stats{grid-template-columns:repeat(2,1fr);}
-    .nav-links{display:none;}
-    .log-item .tag{width:auto;}
+    .tile{flex-wrap:wrap; gap:12px;}
+    .tile .meta{align-items:flex-start; flex-direction:row; width:100%; justify-content:space-between;}
   }
 </style>
 </head>
 <body>
 
 <div class="topbar">
-  <div class="topbar-inner">
-    <div class="brand"><span class="dot"></span>terran1234@security-log</div>
-    <div class="nav-links">
-      <a class="n-malware" href="#malware">malware</a>
-      <a class="n-web" href="#web">web</a>
-      <a class="n-infra" href="#infra">infra</a>
-      <a class="n-hospital" href="#hospital">project</a>
-      <a class="n-network" href="#network">network</a>
-    </div>
-  </div>
+  <div class="topbar-inner"><span class="dot"></span>terran1234@security-log</div>
 </div>
 
 <div class="wrap">
 
   <section class="hero">
     <div class="hero-eyebrow mono">SECURITY LEARNING LOG</div>
-    <h1>웹 해킹과 악성코드 분석,<br>기록하며 <span class="hl">쌓아가는</span> 중입니다.</h1>
-    <p>네트워크 인프라 구축부터 웹 취약점 분석, 지금의 악성코드 정적/동적 분석까지 — 학습 흐름을 5개 카테고리로 나눠 정리했습니다. 각 항목을 누르면 원본 정리 페이지로 이동합니다.</p>
-
+    <h1>네트워크 기초부터 악성코드 분석까지,<br>순서대로 <span class="hl">쌓아온</span> 기록입니다.</h1>
+    <p>배운 순서 그대로 5개 갈래로 나눠 정리했습니다. 각 카드를 누르면 해당 분야의 세부 학습 목록으로 이동합니다.</p>
     <div class="terminal">
-      <div class="terminal-head">
-        <span></span><span></span><span></span>
-        <span class="lbl">whoami.sh</span>
-      </div>
+      <div class="terminal-head"><span></span><span></span><span></span><span class="lbl">whoami.sh</span></div>
       <div class="terminal-body">
         <div class="ln"><span class="prompt">$</span> whoami</div>
         <div class="ln out">조경익 — 웹 보안 / 악성코드 분석 학습자</div>
@@ -217,141 +104,61 @@
         <div class="ln out">FLARE-VM 환경 구축, PE 파일 정적 분석 <span class="caret"></span></div>
       </div>
     </div>
-
-    <div class="notice">
-      <span class="ico">⚠️</span>
-      <span><b>NOTE —</b> 항목 링크는 Notion 원본 페이지로 연결됩니다. 권한이 없는 방문자는 열람이 제한될 수 있습니다.</span>
-    </div>
   </section>
 
-  <div class="stats">
-    <div class="stat"><div class="num">46</div><div class="lbl">총 기록 항목</div></div>
-    <div class="stat"><div class="num">5</div><div class="lbl">학습 카테고리</div></div>
-    <div class="stat"><div class="num">2</div><div class="lbl">팀 프로젝트</div></div>
+  <div class="path mono">LEARNING PATH — OLDEST TO NEWEST</div>
+
+  <div class="tiles">
+    <a class="tile network" href="#">
+      <span class="step mono">01</span>
+      <span class="emoji">🖥️</span>
+      <div class="body">
+        <div class="title">서버 / 네트워크 기초</div>
+        <div class="why">리눅스, 프로토콜, 라우팅·스위칭 등 모든 실습의 토대가 된 기본기</div>
+      </div>
+      <div class="meta"><span class="count">13건</span><span class="arrow">↗</span></div>
+    </a>
+
+    <a class="tile hospital" href="#">
+      <span class="step mono">02</span>
+      <span class="emoji">🏥</span>
+      <div class="body">
+        <div class="title">병원 네트워크 인프라 구축</div>
+        <div class="why">배운 기초를 실전에 적용한 팀 단위 네트워크 구축 프로젝트</div>
+      </div>
+      <div class="meta"><span class="count">2건 · 팀</span><span class="arrow">↗</span></div>
+    </a>
+
+    <a class="tile infra" href="#">
+      <span class="step mono">03</span>
+      <span class="emoji">🛡️</span>
+      <div class="body">
+        <div class="title">보안 인프라 구축</div>
+        <div class="why">방화벽, IDS/IPS, 로그 모니터링 등 방어·탐지 관점의 인프라 구성</div>
+      </div>
+      <div class="meta"><span class="count">14건</span><span class="arrow">↗</span></div>
+    </a>
+
+    <a class="tile web" href="#">
+      <span class="step mono">04</span>
+      <span class="emoji">⚔️</span>
+      <div class="body">
+        <div class="title">웹 해킹 / 워게임</div>
+        <div class="why">방어에서 공격 관점으로 — 웹 취약점을 직접 찾고 공략하는 실습</div>
+      </div>
+      <div class="meta"><span class="count">13건</span><span class="arrow">↗</span></div>
+    </a>
+
+    <a class="tile malware" href="#">
+      <span class="step mono">05</span>
+      <span class="emoji">🦠</span>
+      <div class="body">
+        <div class="title">악성코드 분석</div>
+        <div class="why">웹이 아닌 실행 파일 자체를 뜯어보는 가장 최근 분야, 현재 진행 중</div>
+      </div>
+      <div class="meta"><span class="count">1건 · 진행중</span><span class="arrow">↗</span></div>
+    </a>
   </div>
-
-  <section class="section" id="malware">
-    <div class="section-head">
-      <div class="section-head-top">
-        <span class="idx mono">01</span>
-        <h2>🦠 악성코드 분석</h2>
-        <span class="count">1건 · 진행중</span>
-      </div>
-      <div class="why"><span class="ico">→</span><span>실행 파일 자체를 뜯어보는 분석 계열 — 웹 요청/응답을 다루는 웹 해킹과는 접근 방식이 달라 별도로 분리했습니다.</span></div>
-    </div>
-    <ul class="log-list">
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/FLARE-VM-ea8e4b21e2d083dcab4501f23996769b?pvs=21" target="_blank" rel="noopener"><span class="tag">NEW</span><span class="txt">정적/동적 분석 &amp; FLARE-VM 환경 구축</span><span class="arrow">↗</span></a></li>
-    </ul>
-  </section>
-
-  <section class="section" id="web">
-    <div class="section-head">
-      <div class="section-head-top">
-        <span class="idx mono">02</span>
-        <h2>🐛 웹 해킹 / 워게임</h2>
-        <span class="count">13건</span>
-      </div>
-      <div class="why"><span class="ico">→</span><span>브라우저·서버 간 요청을 이용한 공격 실습. 워게임 사이트 풀이와 취약점별 개념 정리를 함께 묶었습니다.</span></div>
-    </div>
-    <ul class="log-list">
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/overthewire-bb8e4b21e2d083798d4b018cb9922038?pvs=21" target="_blank" rel="noopener"><span class="tag">wargame</span><span class="txt">overthewire</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/Webhacking-kr-a5de4b21e2d0823886ca81d994131506?pvs=21" target="_blank" rel="noopener"><span class="tag">wargame</span><span class="txt">Webhacking.kr</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/Webhacking-kr-2-1e1e4b21e2d08357a09981a6a8134e70?pvs=21" target="_blank" rel="noopener"><span class="tag">wargame</span><span class="txt">Webhacking.kr - 2</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/VM-2ece4b21e2d083b0843481ec094dce63?pvs=21" target="_blank" rel="noopener"><span class="tag">VM</span><span class="txt">웹취약점 VM 풀이</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/WarGame-857e4b21e2d083ee8b5b018bea94a8c9?pvs=21" target="_blank" rel="noopener"><span class="tag">wargame</span><span class="txt">WarGame</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/drunk_admin_hacking-7e4e4b21e2d083a0b7a401fc9ba82272?pvs=21" target="_blank" rel="noopener"><span class="tag">VM</span><span class="txt">취약한 머신 — drunk_admin_hacking</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/webgoat-WAP-682e4b21e2d082a8a6cd01c53d2941ea?pvs=21" target="_blank" rel="noopener"><span class="tag">practice</span><span class="txt">webgoat, WAP</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/bwapp-A6-A7-51ee4b21e2d08328ab2e8122187fa1e9?pvs=21" target="_blank" rel="noopener"><span class="tag">bwapp</span><span class="txt">bwapp A6 — 민감한 데이터 노출, A7 — 기능별 접근 제어 미흡</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/bwapp-A5-6f6e4b21e2d0821ca0c681287caa9d24?pvs=21" target="_blank" rel="noopener"><span class="tag">bwapp</span><span class="txt">bwapp A5 — 보안 설정 오류</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/beebox-6fae4b21e2d08398a39981bce540478c?pvs=21" target="_blank" rel="noopener"><span class="tag">practice</span><span class="txt">beebox</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/ISMS-P-DVWA-2cae4b21e2d0822f9525811bbf863081?pvs=21" target="_blank" rel="noopener"><span class="tag">practice</span><span class="txt">ISMS-P, 웹해킹(DVWA)</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/SSL-TLS-7a8e4b21e2d0831a9888010c69f0de8c?pvs=21" target="_blank" rel="noopener"><span class="tag">note</span><span class="txt">SSL / TLS 정리</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/Buffer-Overflow-d7fe4b21e2d0820b9e5501f9d69a7af4?pvs=21" target="_blank" rel="noopener"><span class="tag">note</span><span class="txt">Buffer Overflow</span><span class="arrow">↗</span></a></li>
-    </ul>
-  </section>
-
-  <section class="section" id="infra">
-    <div class="section-head">
-      <div class="section-head-top">
-        <span class="idx mono">03</span>
-        <h2>🛡️ 보안 인프라 구축</h2>
-        <span class="count">14건</span>
-      </div>
-      <div class="why"><span class="ico">→</span><span>공격이 아니라 방어/탐지 관점 — 방화벽, IDS/IPS, 로그 모니터링 등 인프라를 세우고 지키는 작업을 모았습니다.</span></div>
-    </div>
-    <ul class="log-list">
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/2-24fe4b21e2d083f4825b01efb3cbaf50?pvs=21" target="_blank" rel="noopener"><span class="tag">project</span><span class="txt">보안 인프라 구축 — 2차 프로젝트</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/Wazuh-GoAccess-Nagios-Graylog-Splunk-450e4b21e2d083aa886f815635fd57d0?pvs=21" target="_blank" rel="noopener"><span class="tag">note</span><span class="txt">로그 관리 및 분석 — 시각화 (Wazuh, GoAccess, Nagios, Graylog, Splunk)</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/dc7e4b21e2d08349bfc281e7bb1f3c7a?pvs=21" target="_blank" rel="noopener"><span class="tag">script</span><span class="txt">쉘 스크립트 작성</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/IPS-9afe4b21e2d0827b8f71012ea38f59e5?pvs=21" target="_blank" rel="noopener"><span class="tag">infra</span><span class="txt">IPS 구축</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/Snort-Suricata-6d7e4b21e2d082b69fb78175bee3449d?pvs=21" target="_blank" rel="noopener"><span class="tag">infra</span><span class="txt">Snort, Suricata (공격 탐지 및 차단)</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/27de4b21e2d082c7bc2201f122c044e9?pvs=21" target="_blank" rel="noopener"><span class="tag">os</span><span class="txt">칼리 리눅스</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/DDos-Attack-8cde4b21e2d0823890df811f375b0076?pvs=21" target="_blank" rel="noopener"><span class="tag">attack</span><span class="txt">DDoS Attack</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/UTM-af5e4b21e2d082c18431810422c1a95c?pvs=21" target="_blank" rel="noopener"><span class="tag">infra</span><span class="txt">UTM</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/pfsense-e01e4b21e2d0834080df81c153bf8398?pvs=21" target="_blank" rel="noopener"><span class="tag">infra</span><span class="txt">pfSense 설치 및 패킷 제어</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/pfSense-f9ce4b21e2d082f6a16681062b3693b3?pvs=21" target="_blank" rel="noopener"><span class="tag">TS</span><span class="txt">트러블슈팅 보고서 (pfSense 패키지 다운 오류)</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/ASAv-850e4b21e2d083ac993f812dff5e7f6f?pvs=21" target="_blank" rel="noopener"><span class="tag">infra</span><span class="txt">ASAv 설치 및 패킷 제어</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/firewalld-1d7e4b21e2d0829f841b81a36644a5a2?pvs=21" target="_blank" rel="noopener"><span class="tag">tool</span><span class="txt">와이어샤크, firewalld</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/GNS3-c44e4b21e2d0820cad9201870dbac028?pvs=21" target="_blank" rel="noopener"><span class="tag">infra</span><span class="txt">GNS3</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/DB-9ade4b21e2d082189f930117c0745961?pvs=21" target="_blank" rel="noopener"><span class="tag">monitor</span><span class="txt">도커, DB 모니터링, 네트워크 모니터링</span><span class="arrow">↗</span></a></li>
-    </ul>
-  </section>
-
-  <section class="section" id="hospital">
-    <div class="section-head">
-      <div class="section-head-top">
-        <span class="idx mono">04</span>
-        <h2>🏥 병원 네트워크 인프라 구축</h2>
-        <span class="count">2건 · 팀 프로젝트</span>
-      </div>
-      <div class="why"><span class="ico">→</span><span>개인 실습이 아니라 팀 단위로 진행한 실전형 프로젝트라 별도로 구분했습니다.</span></div>
-    </div>
-    <ul class="log-list">
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/62de4b21e2d082de802201da4c7338fa?pvs=21" target="_blank" rel="noopener"><span class="tag">team</span><span class="txt">병원 네트워크 인프라 구축 (팀프로젝트)</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/5bae4b21e2d082c5bdb68145aa6a3414?pvs=21" target="_blank" rel="noopener"><span class="tag">team</span><span class="txt">병원 네트워크 인프라 구축 프로젝트 정리</span><span class="arrow">↗</span></a></li>
-    </ul>
-  </section>
-
-  <section class="section" id="network">
-    <div class="section-head">
-      <div class="section-head-top">
-        <span class="idx mono">05</span>
-        <h2>🖥️ 서버 / 네트워크 기초</h2>
-        <span class="count">14건</span>
-      </div>
-      <div class="why"><span class="ico">→</span><span>공격/방어 실습에 앞서 다진 기본기 — 리눅스, 프로토콜, 라우팅·스위칭 등 인프라의 토대가 되는 내용입니다.</span></div>
-    </div>
-    <ul class="log-list">
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/DB-715e4b21e2d083188ed68146ac70a36d?pvs=21" target="_blank" rel="noopener"><span class="tag">db</span><span class="txt">클라우드, 커널 설정, DB 복제</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/2022-86de4b21e2d0834bb86001c30e65d862?pvs=21" target="_blank" rel="noopener"><span class="tag">server</span><span class="txt">윈도우 서버 2022 서비스 구축, 패스워드 정책 (리눅스)</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/0e1e4b21e2d08390974201d30ee114f3?pvs=21" target="_blank" rel="noopener"><span class="tag">linux</span><span class="txt">리눅스 계정 관련 명령어</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/LOG-4dfe4b21e2d0823e939a01980f7bca53?pvs=21" target="_blank" rel="noopener"><span class="tag">log</span><span class="txt">LOG</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/754e4b21e2d082c6b493016ff96dc5e5?pvs=21" target="_blank" rel="noopener"><span class="tag">share</span><span class="txt">자원 공유</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/HTTPS-FTP-DNS-8aae4b21e2d083ae820e8140ab9a3f26?pvs=21" target="_blank" rel="noopener"><span class="tag">protocol</span><span class="txt">HTTPS, FTP, DNS</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/SQL-ceee4b21e2d08308a689017c8a56c223?pvs=21" target="_blank" rel="noopener"><span class="tag">linux</span><span class="txt">리눅스 기본 명령어, SQL</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/VPN-af6e4b21e2d08325bbb48100a7b447cc?pvs=21" target="_blank" rel="noopener"><span class="tag">network</span><span class="txt">VPN</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/ASL-NAT-329e4b21e2d082e4b50d811ba477275f?pvs=21" target="_blank" rel="noopener"><span class="tag">network</span><span class="txt">ASL, NAT</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/DHCP-OSRF-651e4b21e2d08294be13019abd9f6975?pvs=21" target="_blank" rel="noopener"><span class="tag">network</span><span class="txt">DHCP, OSRF</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/0aee4b21e2d0823b86c3012c203ecc7e?pvs=21" target="_blank" rel="noopener"><span class="tag">network</span><span class="txt">라우팅 설정</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/VLAN-9bce4b21e2d083088ddc816e57744fbd?pvs=21" target="_blank" rel="noopener"><span class="tag">network</span><span class="txt">VLAN 설정</span><span class="arrow">↗</span></a></li>
-      <li class="log-item"><a class="log-link" href="https://app.notion.com/p/338e4b21e2d082ff93728182819448fa?pvs=21" target="_blank" rel="noopener"><span class="tag">basic</span><span class="txt">패킷 트레이서 기초</span><span class="arrow">↗</span></a></li>
-    </ul>
-  </section>
-
-  <section class="section" id="etc">
-    <div class="section-head">
-      <div class="section-head-top">
-        <span class="idx mono">06</span>
-        <h2>📌 기타</h2>
-        <span class="count">2건</span>
-      </div>
-      <div class="why"><span class="ico">→</span><span>분류에 넣기 애매한 임시/양식 파일들입니다.</span></div>
-    </div>
-    <ul class="log-list">
-      <li class="log-item"><span class="log-link disabled"><span class="tag">draft</span><span class="txt">임시 파일</span></span></li>
-      <li class="log-item"><span class="log-link disabled"><span class="tag">draft</span><span class="txt">Template</span></span></li>
-    </ul>
-  </section>
 
   <footer>
     <span>© 2026 조경익 · security learning log</span>
@@ -359,6 +166,5 @@
   </footer>
 
 </div>
-
 </body>
 </html>
