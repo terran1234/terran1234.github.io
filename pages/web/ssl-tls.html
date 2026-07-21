@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSL / TLS 정리 — 조경익</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#ffffff; --bg-alt:#f5f6f8; --panel:#f7f8fa; --panel-border:#e2e5ea;
+    --text:#1a1f24; --text-dim:#4b5560; --text-faint:#7c8894; --accent:#0f9d8f; --line:#e5e8ec;
+    --c-concept:#7c3aed;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{background:radial-gradient(ellipse at top left, rgba(94,234,212,0.06), transparent 45%), var(--bg);
+    color:var(--text); font-family:'Noto Sans KR', sans-serif; line-height:1.7; -webkit-font-smoothing:antialiased;}
+  .mono{font-family:'JetBrains Mono', monospace;}
+  a{color:inherit; text-decoration:none;}
+  .wrap{max-width:760px; margin:0 auto; padding:0 24px;}
+  .topbar{border-bottom:1px solid var(--line); background:rgba(255,255,255,0.9); backdrop-filter:blur(6px);}
+  .topbar-inner{display:flex; align-items:center; gap:16px; padding:14px 24px; max-width:760px; margin:0 auto;
+    font-family:'JetBrains Mono',monospace; font-size:12.5px; color:var(--text-dim);}
+  .topbar-inner a:hover{color:var(--accent);}
+  .sep{color:var(--text-faint);}
+  .hero{padding:44px 0 28px; border-bottom:1px solid var(--line); margin-bottom:32px;}
+  .eyebrow{font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--c-concept); letter-spacing:.08em; margin-bottom:14px;}
+  .hero h1{font-size:clamp(24px,4vw,32px); font-weight:900; margin-bottom:10px;}
+  .hero p{color:var(--text-dim); font-size:14px;}
+  .content{padding-bottom:70px;}
+  .content h2{font-size:19px; font-weight:700; margin:32px 0 12px; padding-bottom:8px; border-bottom:1px solid var(--line);}
+  .content p{font-size:14px; color:var(--text-dim); margin-bottom:10px;}
+  .content ul{margin:0 0 14px 20px; font-size:14px; color:var(--text-dim);}
+  .content li{margin-bottom:4px;}
+  .content li b{color:var(--text);}
+  .why-box{margin:22px 0; padding:14px 16px; background:var(--panel); border-left:3px solid var(--c-concept); border-radius:8px; font-size:13.5px; color:var(--text-dim);}
+  .misconception{margin-bottom:14px; padding:14px 16px; background:var(--panel); border:1px solid var(--panel-border); border-radius:8px;}
+  .misconception .wrong{color:#dc2626; font-size:13.5px; margin-bottom:4px;}
+  .misconception .right{color:#0f9d5a; font-size:13.5px;}
+  .summary{margin-top:28px; padding:18px 20px; background:#f4f0ff; border:1px solid #e0d4ff; border-radius:10px; font-size:14px; color:var(--text); font-weight:600; text-align:center;}
+  footer{border-top:1px solid var(--line); padding:24px 0 50px; text-align:center; font-family:'JetBrains Mono',monospace; font-size:12px; color:var(--text-faint);}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-inner">
+    <a href="../../index.html">메인</a><span class="sep">/</span>
+    <a href="../../web.html">웹 해킹 / 워게임</a><span class="sep">/</span>
+    <span>SSL / TLS 정리</span>
+  </div>
+</div>
+
+<div class="wrap">
+  <section class="hero">
+    <div class="eyebrow mono">📖 개념 정리</div>
+    <h1>SSL / TLS 정리</h1>
+    <p>beebox 문제를 풀면서 TLS 개념이 계속 등장했는데 정확히 정리가 안 되어 헷갈려서 따로 정리한 노트</p>
+  </section>
+
+  <div class="content">
+
+    <h2>1. SSL/TLS 정의</h2>
+    <p>네트워크에서 애플리케이션 계층 데이터(HTTP 등)를 안전하게 보호하는 보안 프로토콜.</p>
+    <ul>
+      <li><b>SSL</b>(Secure Sockets Layer) — 구버전 프로토콜</li>
+      <li><b>TLS</b>(Transport Layer Security) — SSL을 개선한 최신 표준</li>
+    </ul>
+    <p>현재는 TLS가 표준이지만, 관습적으로 SSL이라는 용어도 여전히 함께 쓰임.</p>
+
+    <h2>2. TLS의 역할</h2>
+    <ul>
+      <li><b>암호화(Encryption)</b> — 데이터 내용 보호</li>
+      <li><b>무결성(Integrity)</b> — 데이터 변조 방지</li>
+      <li><b>인증(Authentication)</b> — 상대 서버/클라이언트 신원 확인</li>
+    </ul>
+
+    <h2>3. TLS가 보호하는 데이터</h2>
+    <p>TLS는 "패킷 전체"가 아니라 HTTP 요청/응답 내용, 로그인 정보, 메시지·파일 데이터 등 <b>애플리케이션이 실제로 주고받는 데이터(애플리케이션 계층 데이터)</b>를 보호.</p>
+
+    <h2>4. 동작 위치 (OSI 개념)</h2>
+    <p>TLS는 특정 OSI 한 계층에 고정되지 않고, 애플리케이션 계층과 전송 계층(TCP) 사이에서 동작하는 논리적 보안 계층.</p>
+
+    <h2>5. 동작 방식 (핵심 흐름)</h2>
+    <ul>
+      <li>송신 측: 애플리케이션 데이터 → TLS가 암호화 → TCP로 전달</li>
+      <li>수신 측: TCP 데이터 → TLS가 복호화 → 애플리케이션으로 전달</li>
+    </ul>
+
+    <h2>6. 헷갈렸던 핵심 정리</h2>
+
+    <div class="misconception">
+      <div class="wrong">❌ "패킷 전체를 보호한다"</div>
+      <div class="right">✔ 실제로는 애플리케이션 데이터만 보호. 네트워크 계층 정보(IP, TCP 등)는 통신을 위해 노출이 필요해 암호화하지 않음. 전체 통신을 보호하려면 VPN·IPsec 같은 기술이 추가로 필요.</div>
+    </div>
+    <div class="misconception">
+      <div class="wrong">❌ "OSI 6~7계층 사이에 물리적으로 존재한다"</div>
+      <div class="right">✔ 실제로는 계층 사이에서 동작하는 논리적 구조일 뿐, 물리적으로 낀 계층이 아님.</div>
+    </div>
+    <div class="misconception">
+      <div class="wrong">❌ "애플리케이션 데이터와 전송 계층 데이터가 완전히 분리된다"</div>
+      <div class="right">✔ 실제 구조는 계층별로 데이터가 추가되는 캡슐화(encapsulation) 구조.</div>
+    </div>
+
+    <div class="summary">TLS는 애플리케이션 계층 데이터를 암호화·인증·무결성 검증하여<br>전송 계층을 통해 안전하게 전달하는 보안 프로토콜</div>
+
+  </div>
+
+  <footer>© 2026 조경익 · security learning log</footer>
+</div>
+</body>
+</html>
